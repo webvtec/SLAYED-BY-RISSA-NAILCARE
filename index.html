@@ -2199,8 +2199,27 @@ function loadProducts() {
       const grid = sectionDiv.querySelector(`#grid-${section.replace(/\s+/g,'-')}`);
 
       sections[section].forEach(product => {
-  const imageUrl = product.image || product.url || 'https://via.placeholder.com/200';
-  
+        // 🔑 Handle all possible image cases
+        let imageUrl = product.image || product.url || product.photo || product.img || '';
+
+        // If it looks like a Firebase Storage path instead of a URL → get download URL
+        if (imageUrl && !imageUrl.startsWith('http')) {
+          firebase.storage().ref(imageUrl).getDownloadURL().then(url => {
+            renderProductCard(grid, product, url);
+          }).catch(err => {
+            console.error("Image load error:", err);
+            renderProductCard(grid, product, 'https://via.placeholder.com/200');
+          });
+        } else {
+          renderProductCard(grid, product, imageUrl || 'https://via.placeholder.com/200');
+        }
+      });
+    }
+  });
+}
+
+// 🔧 Separate rendering into helper
+function renderProductCard(grid, product, imageUrl) {
   grid.innerHTML += `
     <div style="background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:15px; text-align:center;">
       <img src="${imageUrl}" 
@@ -2215,10 +2234,9 @@ function loadProducts() {
       </button>
     </div>
   `;
-    });
-    }
-  });
 }
+
+
 
 // ✅ Update showSection so products load when switching
 function showSection(sectionId) {
