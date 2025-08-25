@@ -400,6 +400,14 @@ box-sizing: border-box;
 </div> <!-- ✅ now closes correctly -->
 
 
+  <label for="productSectionSelect">SELECT PRODUCT SECTION</label>
+<select id="productSectionSelect">
+  <option value="HAIR PRODUCTS">HAIR PRODUCTS</option>
+  <option value="NAIL PRODUCTS">NAIL PRODUCTS</option>
+  <option value="MAKEUP PRODUCTS">MAKEUP PRODUCTS</option>
+</select>
+
+
     <!-- Reservations Section -->
 <div class="admin-container content-section" id="reservationsPage">
 <h2>Reservations</h2>
@@ -602,28 +610,36 @@ box-sizing: border-box;
     }
 
     function addPhotoUrl() {
-      const urlInput = document.getElementById('photoUrlInput');
-      const categorySelect = document.getElementById('photoCategorySelect');
-      const url = urlInput.value.trim();
-      const category = categorySelect.value.trim();
+  const urlInput = document.getElementById('photoUrlInput');
+  const categorySelect = document.getElementById('photoCategorySelect');
+  const sectionSelect = document.getElementById('productSectionSelect');
+  const url = urlInput.value.trim();
+  const category = categorySelect.value.trim();
+  const section = sectionSelect.value.trim();
 
-      if (url === '' || category === '') {
-        alert('Please enter a valid image URL and select a category.');
-        return;
-      }
+  if (url === '' || category === '' || section === '') {
+    alert('Please enter a valid image URL and select both category and product section.');
+    return;
+  }
 
-      db.collection('gallery').add({ url: url, category: category })
-        .then(() => {
-          urlInput.value = '';
-          categorySelect.value = '';
-          alert('Photo added successfully!');
-        })
-        .catch(error => {
-          console.error("Error adding document: ", error);
-          alert('Error adding photo: ' + error.message);
-        });
+  db.collection('gallery').add({ 
+    url: url, 
+    category: category,
+    section: section 
+  })
+    .then(() => {
+      urlInput.value = '';
+      categorySelect.value = '';
+      sectionSelect.value = '';
+      alert('Photo added successfully!');
+    })
+    .catch(error => {
+      console.error("Error adding document: ", error);
+      alert('Error adding photo: ' + error.message);
+    });
     }
 
+    
     function loadGallery() {
       const galleryContainer = document.getElementById('adminGallery');
       galleryContainer.innerHTML = '';
@@ -1256,7 +1272,7 @@ function loadProducts() {
             <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">${product.description}</p>
             <p style="margin: 0; font-weight: bold; color: #E58BBE;">$${product.price}</p>
             <p style="margin: 5px 0 0 0; font-size: 12px; color: ${product.active ? '#4CAF50' : '#ff9800'};">
-             ${product.active ? '✅ Visible to Admin & Customers' : '👁️ Hidden from Admin (Customers can still see)'}
+             ${product.active ? '✅ Visible to Admin & Customers' : '🚫 Hidden from Customers (Admin can still see)'}
              </p>
           </div>
           
@@ -1264,7 +1280,7 @@ function loadProducts() {
             <button class="edit-btn" onclick="editProduct('${doc.id}')">Edit</button>
             <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Delete</button>
             <button class="toggle-btn" onclick="toggleProductStatus('${doc.id}', ${!product.active})">
-            ${product.active ? 'Hide from Admin' : 'Show in Admin'}
+            ${product.active ? 'Hide from Customers' : 'Show to Customers'}
             </button>
           </div>
         `;
@@ -1391,10 +1407,10 @@ function deleteProduct(productId) {
 }
 
 function toggleProductStatus(productId, newStatus) {
-  const actionText = newStatus ? 'activate' : 'hide from admin view';
+  const actionText = newStatus ? 'show to customers' : 'hide from customers';
   const confirmMessage = newStatus 
-    ? 'Activate this product?' 
-    : 'Hide this product from admin view? (Customers will still see it)';
+    ? 'Show this product to customers?' 
+    : 'Hide this product from customers? (Admin will still see it)';
     
   if (!confirm(confirmMessage)) return;
 
@@ -1403,15 +1419,14 @@ function toggleProductStatus(productId, newStatus) {
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   })
   .then(() => {
-    const statusText = newStatus ? 'activated' : 'hidden from admin view';
-    alert(`Product ${statusText} successfully! ${!newStatus ? 'Customers can still see it.' : ''}`);
+    const statusText = newStatus ? 'shown to customers' : 'hidden from customers';
+    alert(`Product ${statusText} successfully! ${!newStatus ? 'Admin can still see it.' : ''}`);
   })
   .catch(error => {
     console.error('Error updating product status:', error);
     alert('Error updating product status: ' + error.message);
   });
 }
-
 
   </script>
 </body>
