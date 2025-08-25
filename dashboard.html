@@ -1285,6 +1285,10 @@ function loadProducts() {
             <p style="margin: 5px 0 0 0; font-size: 12px; color: ${product.active ? '#4CAF50' : '#ff9800'};">
              ${product.active ? '✅ Visible to Admin & Customers' : '🚫 Hidden from Customers (Admin can still see)'}
              </p>
+             <p style="margin: 0 0 5px 0; font-size: 13px; color: #999;">
+             Section: ${product.section || "Uncategorized"}
+              </p>
+
           </div>
           
           <div class="product-actions">
@@ -1307,27 +1311,29 @@ function addProduct() {
   const price = parseFloat(document.getElementById('productPriceInput').value);
   const imageUrl = document.getElementById('productImageInput').value.trim();
   const active = document.getElementById('productActiveInput').checked;
-  
-  if (!name || !description || !price || !imageUrl) {
+  const section = document.getElementById('productSectionSelect').value; // ✅ new
+
+  if (!name || !description || !price || !imageUrl || !section) {
     alert('Please fill in all fields.');
     return;
   }
-  
+
   if (price <= 0) {
     alert('Price must be greater than 0.');
     return;
   }
-  
+
   const productData = {
     name,
     description,
     price,
     imageUrl,
     active,
+    section, // ✅ save section
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
-  
+
   if (editingProductId) {
     // Update existing product
     db.collection('products').doc(editingProductId).update(productData)
@@ -1353,6 +1359,7 @@ function addProduct() {
   }
 }
 
+
 function editProduct(productId) {
   editingProductId = productId;
   
@@ -1370,6 +1377,9 @@ function editProduct(productId) {
       document.getElementById('productPriceInput').value = product.price;
       document.getElementById('productImageInput').value = product.imageUrl;
       document.getElementById('productActiveInput').checked = product.active;
+      
+      // ✅ Restore the product section
+      document.getElementById('productSectionSelect').value = product.section || "Hair Products";
       
       document.getElementById('productFormTitle').textContent = 'Edit Product';
       document.getElementById('productSubmitBtn').textContent = 'Update Product';
