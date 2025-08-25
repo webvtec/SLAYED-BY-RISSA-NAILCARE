@@ -2154,31 +2154,80 @@ document.addEventListener('DOMContentLoaded', function() {
 // Shopping cart functionality
 let cart = [];
 
+// Updated loadProducts function with better error handling
 function loadProducts() {
   const grid = document.getElementById('productsGrid');
   const empty = document.getElementById('productsEmpty');
   
+  console.log('Loading products...'); // Debug log
+  
+  // Show loading state
+  grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Loading products...</div>';
+  empty.style.display = 'none';
+  
+  // Try to load all products first, then filter
   db.collection('products')
-    .where('active', '==', true)
-    .orderBy('createdAt', 'desc')
     .onSnapshot(snapshot => {
+      console.log('Products query returned:', snapshot.size, 'documents'); // Debug log
+      
       grid.innerHTML = '';
       
       if (snapshot.empty) {
+        console.log('No products found in database'); // Debug log
         empty.style.display = 'block';
         return;
       }
       
       empty.style.display = 'none';
+      let activeProductsCount = 0;
       
       snapshot.forEach(doc => {
         const product = doc.data();
-        const productCard = createProductCard(doc.id, product);
-        grid.appendChild(productCard);
+        console.log('Product data:', product); // Debug log
+        
+        // Check if product should be displayed (active or no active field)
+        if (product.active !== false) { // Show if active is true or undefined
+          const productCard = createProductCard(doc.id, product);
+          grid.appendChild(productCard);
+          activeProductsCount++;
+        }
       });
+      
+      console.log('Active products displayed:', activeProductsCount); // Debug log
+      
+      // If no active products, show empty state
+      if (activeProductsCount === 0) {
+        empty.style.display = 'block';
+        grid.innerHTML = '';
+      }
+    }, error => {
+      console.error('Error loading products:', error);
+      grid.innerHTML = `
+        <div style="
+          text-align: center; 
+          padding: 40px; 
+          color: #f44336;
+          background: #ffebee;
+          border-radius: 8px;
+          margin: 20px;
+        ">
+          <h3>Error Loading Products</h3>
+          <p>${error.message}</p>
+          <button onclick="loadProducts()" style="
+            background: #E58BBE;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+          ">Try Again</button>
+        </div>
+      `;
     });
 }
 
+// Also update createProductCard to handle missing fields
 function createProductCard(id, product) {
   const card = document.createElement('div');
   card.style.cssText = `
@@ -2189,26 +2238,32 @@ function createProductCard(id, product) {
     transition: transform 0.3s ease;
   `;
   
+  // Handle missing fields with defaults
+  const name = product.name || 'Unnamed Product';
+  const description = product.description || 'No description available';
+  const price = product.price || 0;
+  const imageUrl = product.imageUrl || product.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+  
   card.innerHTML = `
-    <img src="${product.imageUrl}" alt="${product.name}" style="
+    <img src="${imageUrl}" alt="${name}" style="
       width: 100%;
       height: 200px;
       object-fit: cover;
-    ">
+    " onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';">
     
     <div style="padding: 20px;">
       <h3 style="
         margin: 0 0 10px 0;
         color: #333;
         font-size: 18px;
-      ">${product.name}</h3>
+      ">${name}</h3>
       
       <p style="
         color: #666;
         font-size: 14px;
         line-height: 1.4;
         margin: 0 0 15px 0;
-      ">${product.description}</p>
+      ">${description}</p>
       
       <div style="
         display: flex;
@@ -2219,9 +2274,9 @@ function createProductCard(id, product) {
           font-size: 20px;
           font-weight: bold;
           color: #E58BBE;
-        ">$${product.price}</span>
+        ">$${parseFloat(price).toFixed(2)}</span>
         
-        <button onclick="addToCart('${id}', '${product.name}', ${product.price}, '${product.imageUrl}')" style="
+        <button onclick="addToCart('${id}', '${name.replace(/'/g, "\\'")}', ${price}, '${imageUrl}')" style="
           background: #61134A;
           color: white;
           border: none;
@@ -2237,6 +2292,7 @@ function createProductCard(id, product) {
   return card;
 }
 
+    
 function addToCart(id, name, price, imageUrl) {
   const existingItem = cart.find(item => item.id === id);
   
