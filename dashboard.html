@@ -585,12 +585,17 @@ box-sizing: border-box;
     const db = firebase.firestore();
 
     function showSection(sectionId) {
-      document.querySelectorAll('.content-section').forEach(section =>
-        section.classList.remove('active')
-      );
-      document.getElementById(sectionId).classList.add('active');
+  document.querySelectorAll('.content-section').forEach(section =>
+    section.classList.remove('active')
+  );
+  document.getElementById(sectionId).classList.add('active');
+  
+  // Load products when switching to products section
+  if (sectionId === 'productsSection') {
+    loadProducts();
+  }
     }
-
+    
     function toggleTimeInputs() {
       const isAllDay = document.getElementById('allDayCheckbox').checked;
       document.getElementById('timeInputs').style.display = isAllDay ? 'none' : 'block';
@@ -1102,11 +1107,11 @@ function removeUnavailableDate(id) { db.collection('unavailableDays').doc(id).de
 
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
-    loadGallery();   // ✅ add this
-    showSection('reservationsPage');
+    loadGallery();
     loadReservations();
     loadUnavailableDates();
-    loadProducts(); // ✅ add this
+    loadProducts(); // ✅ Make sure this is called when authenticated
+    showSection('productsSection'); // Start with products section to test
   } else {
     window.location.href = 'index.html';
   }
@@ -1250,16 +1255,16 @@ function loadProducts() {
             <h4 style="margin: 0 0 5px 0; color: #333;">${product.name}</h4>
             <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">${product.description}</p>
             <p style="margin: 0; font-weight: bold; color: #E58BBE;">$${product.price}</p>
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: ${product.active ? '#4CAF50' : '#f44336'};">
-              ${product.active ? '✅ Active' : '❌ Inactive'}
-            </p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: ${product.active ? '#4CAF50' : '#ff9800'};">
+             ${product.active ? '✅ Visible to Admin & Customers' : '👁️ Hidden from Admin (Customers can still see)'}
+             </p>
           </div>
           
           <div class="product-actions">
             <button class="edit-btn" onclick="editProduct('${doc.id}')">Edit</button>
             <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Delete</button>
             <button class="toggle-btn" onclick="toggleProductStatus('${doc.id}', ${!product.active})">
-              ${product.active ? 'Deactivate' : 'Activate'}
+            ${product.active ? 'Hide from Admin' : 'Show in Admin'}
             </button>
           </div>
         `;
@@ -1386,13 +1391,20 @@ function deleteProduct(productId) {
 }
 
 function toggleProductStatus(productId, newStatus) {
+  const actionText = newStatus ? 'activate' : 'hide from admin view';
+  const confirmMessage = newStatus 
+    ? 'Activate this product?' 
+    : 'Hide this product from admin view? (Customers will still see it)';
+    
+  if (!confirm(confirmMessage)) return;
+
   db.collection('products').doc(productId).update({
     active: newStatus,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   })
   .then(() => {
-    const statusText = newStatus ? 'activated' : 'deactivated';
-    alert(`Product ${statusText} successfully!`);
+    const statusText = newStatus ? 'activated' : 'hidden from admin view';
+    alert(`Product ${statusText} successfully! ${!newStatus ? 'Customers can still see it.' : ''}`);
   })
   .catch(error => {
     console.error('Error updating product status:', error);
