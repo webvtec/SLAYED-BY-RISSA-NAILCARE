@@ -2554,23 +2554,25 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
 }
 
 // Call loadProducts when the Products page is shown
-function showSection(sectionId) {
-  document.querySelectorAll('.content-section').forEach(section =>
-    section.classList.remove('active')
-  );
-  document.getElementById(sectionId).classList.add('active');
-
-  if (sectionId === 'productsSection') {
-    loadProducts();
-  }
-}
-
-// Also load immediately if Products is the default
-window.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('productsSection').classList.contains('active')) {
-    loadProducts();
-  }
+sections[section].forEach(product => {
+  const imageUrl = product.image || product.url || 'https://via.placeholder.com/200';
+  
+  grid.innerHTML += `
+    <div style="background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:15px; text-align:center;">
+      <img src="${imageUrl}" 
+           alt="${product.name}" 
+           style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+      <h3 style="color:#61134A;">${product.name || 'Untitled'}</h3>
+      <p style="color:#555; font-size:14px;">${product.description || ''}</p>
+      <p style="color:#E58BBE; font-weight:bold;">$${product.price || '0.00'}</p>
+      <button onclick="addToCart('${product.id}', '${product.name}', ${product.price}, '${imageUrl}')"
+        style="background:#E58BBE; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;">
+        Add to Cart
+      </button>
+    </div>
+  `;
 });
+
 
     
   </script>
