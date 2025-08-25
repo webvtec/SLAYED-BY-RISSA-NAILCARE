@@ -2594,14 +2594,16 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     }
 
 
-    function showOrderConfirmation(orderNumber, customerName, total) {
+    function showOrderConfirmation(orderNumber, customerName, total, cart) {
   Swal.fire({
     title: "Order Confirmed!",
     html: `
       <div style="text-align:left; font-size:16px; line-height:1.6; color:#333;">
         <div style="text-align:center; margin-bottom:20px;">
           <h3 style="color:#61134A; margin:0;">Thank you, ${customerName}!</h3>
-          <p style="color:#E58BBE; font-size:18px; font-weight:bold; margin:5px 0;">Order #: ${orderNumber}</p>
+          <p style="color:#E58BBE; font-size:18px; font-weight:bold; margin:5px 0;">
+            Order #: ${orderNumber}
+          </p>
         </div>
         
         <hr style="margin:15px 0; border:none; height:1px; background:#ddd;">
@@ -2631,7 +2633,10 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
         
         <div style="background:#fff3cd; padding:15px; border-radius:8px; border-left:4px solid:#ffc107; margin-top:15px;">
           <h4 style="color:#856404; margin:0 0 5px 0;">Important Notes:</h4>
-          <p style="margin:0; font-size:14px; color:#856404;">Please keep your order number for reference. You can also find this information in your account under "My Orders".</p>
+          <p style="margin:0; font-size:14px; color:#856404;">
+            Please keep your order number for reference. 
+            You can also find this information in your account under "My Orders".
+          </p>
         </div>
       </div>
     `,
@@ -2639,12 +2644,20 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     confirmButtonText: "Continue Shopping",
     confirmButtonColor: "#61134A",
     showCancelButton: true,
-    cancelButtonText: "false",
+    cancelButtonText: "View My Orders",
     cancelButtonColor: "#E58BBE",
     customClass: {
       popup: "swal2-rounded"
     }
+  }).then((result) => {
+    if (result.dismiss === Swal.DismissReason.cancel) {
+      // If user clicks "View My Orders"
+      showUserOrders(); // make sure this function exists
     }
+  });
+}
+
+    
 
 
     function showUserOrders() {
