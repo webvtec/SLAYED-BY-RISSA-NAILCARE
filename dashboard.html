@@ -595,6 +595,7 @@ box-sizing: border-box;
       });
     }
 
+
     function loadReservations() {
   const reservationsContainer = document.getElementById('reservationsList');
   db.collection('bookings').orderBy("date", "asc").onSnapshot(snapshot => {
