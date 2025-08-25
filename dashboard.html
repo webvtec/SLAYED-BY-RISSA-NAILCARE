@@ -379,34 +379,44 @@ box-sizing: border-box;
   <button onclick="showSection('unavailableDaysSection')">UNAVAILABLE DAYS</button>
   </div>
 
-  <!-- Gallery Management Page -->
+  <!-- ✅ Gallery Management Page -->
 <div id="gallerySection" class="admin-container content-section">
-  <h2>INPUT CLOUDINARY URL</h2>
-  <input type="text" id="photoUrlInput" placeholder="Enter image URL here">
+  <h2>Input Cloudinary URL</h2>
 
-  <label for="photoCategorySelect">SELECT CATEGORY</label>
+  <!-- Image URL Input -->
+  <label for="photoUrlInput">Image URL</label>
+  <input 
+    type="text" 
+    id="photoUrlInput" 
+    placeholder="Enter image URL here"
+  >
+
+  <!-- Category Select -->
+  <label for="photoCategorySelect">Select Category</label>
   <select id="photoCategorySelect">
-    <option value="Nails">NAILS</option>
-    <option value="Manicure">MANICURE</option>
-    <option value="Pedicure">PEDICURE</option>
-    <option value="Gel Polish">GEL POLISH</option>
-    <option value="EXTENSIONS">EXTENSIONS</option>
-    <option value="Paraffin Wax">PARAFFIN WAX</option>
+    <option value="Nails">Nails</option>
+    <option value="Manicure">Manicure</option>
+    <option value="Pedicure">Pedicure</option>
+    <option value="Gel Polish">Gel Polish</option>
+    <option value="Extensions">Extensions</option>
+    <option value="Paraffin Wax">Paraffin Wax</option>
   </select>
 
+  <!-- Product Section Select -->
+  <label for="productSectionSelect">Select Product Section</label>
+  <select id="productSectionSelect">
+    <option value="Hair Products">Hair Products</option>
+    <option value="Nail Products">Nail Products</option>
+    <option value="Makeup Products">Makeup Products</option>
+  </select>
 
-  <label for="productSectionSelect">SELECT PRODUCT SECTION</label>
-<select id="productSectionSelect">
-  <option value="HAIR PRODUCTS">HAIR PRODUCTS</option>
-  <option value="NAIL PRODUCTS">NAIL PRODUCTS</option>
-  <option value="MAKEUP PRODUCTS">MAKEUP PRODUCTS</option>
-</select>
+  <!-- Add Button -->
+  <button type="button" onclick="addPhotoUrl()">Add Photo</button>
 
-
-  <button onclick="addPhotoUrl()">Add Photo</button>
-
+  <!-- Admin Gallery -->
   <div id="adminGallery"></div>
-</div> <!-- ✅ now closes correctly -->
+</div>
+
 
 
     <!-- Reservations Section -->
