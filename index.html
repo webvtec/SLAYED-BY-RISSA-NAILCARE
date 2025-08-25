@@ -2154,6 +2154,7 @@ let cart = [];
 
 // Updated loadProducts function with better error handling
 
+
 function loadProducts() {
   const container = document.getElementById('productsGrid');
   const emptyState = document.getElementById('productsEmpty');
@@ -2190,19 +2191,19 @@ function loadProducts() {
           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
           gap: 20px;
           margin-bottom: 40px;
-        " id="grid-${section}"></div>
+        " id="grid-${section.replace(/\s+/g,'-')}"></div>
       `;
       container.appendChild(sectionDiv);
 
-      const grid = sectionDiv.querySelector(`#grid-${section}`);
+      const grid = sectionDiv.querySelector(`#grid-${section.replace(/\s+/g,'-')}`);
 
       sections[section].forEach(product => {
         grid.innerHTML += `
           <div style="background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:15px; text-align:center;">
-            <img src="${product.image}" alt="${product.name}" style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
-            <h3 style="color:#61134A;">${product.name}</h3>
+            <img src="${product.image || ''}" alt="${product.name}" style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+            <h3 style="color:#61134A;">${product.name || 'Untitled'}</h3>
             <p style="color:#555; font-size:14px;">${product.description || ''}</p>
-            <p style="color:#E58BBE; font-weight:bold;">$${product.price}</p>
+            <p style="color:#E58BBE; font-weight:bold;">$${product.price || '0.00'}</p>
             <button onclick="addToCart('${product.id}', '${product.name}', ${product.price}, '${product.image}')"
               style="background:#E58BBE; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;">
               Add to Cart
