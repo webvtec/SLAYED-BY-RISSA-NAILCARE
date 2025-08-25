@@ -2531,22 +2531,24 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     });
 }
 
-// Initialize products when section is shown
+// Call loadProducts when the Products page is shown
 function showSection(sectionId) {
   document.querySelectorAll('.content-section').forEach(section =>
     section.classList.remove('active')
   );
   document.getElementById(sectionId).classList.add('active');
 
-  if (sectionId === 'gallerySection') {
-    loadGallery('galleryDisplay');
-  } else if (sectionId === 'reviewsSection') {
-    loadReviews(currentUser);
-  } else if (sectionId === 'productsSection') {
+  if (sectionId === 'productsSection') {
     loadProducts();
   }
 }
 
+// Also load immediately if Products is the default
+window.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('productsSection').classList.contains('active')) {
+    loadProducts();
+  }
+});
 
     
   </script>
