@@ -450,26 +450,7 @@
 <div class="header-bar">
 <button class="menu-button" onclick="toggleMenu()">☰</button>
 <div class="header-title">SLAYED BY RISSA NAILS</div>
-<div style="position: absolute; right: 0; top: 0;">
-  <a class="location-button" href="https://maps.app.goo.gl/Y5KEuKuHc6AVJY1BA" target="_blank">📍</a>
-  <button class="cart-button" onclick="toggleCart()">🛒
-    <span id="cartCount" style="
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: red;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-    ">0</span>
-  </button>
-</div>
+<a class="location-button" href="https://maps.app.goo.gl/Y5KEuKuHc6AVJY1BA" target="_blank">📍</a>
 </div>
 
     
@@ -733,10 +714,40 @@
     <!-- Add this to your main index.html file after the reviewsSection div -->
 
 <!-- Products Section -->
-<div class="content-section" id="productsSection">
-  <div style="margin: 60px 20px 20px 20px;">
-    <h1 style="color: #FE5DC7; margin: 0; text-align: center;">PRODUCTS</h1>
-  </div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin: 60px 20px 20px 20px;">
+  <h1 style="color: #FE5DC7; margin: 0;">NAIL PRODUCTS</h1>
+  
+  <button onclick="toggleCart()" style="
+    position: relative;
+    cursor: pointer;
+    background: #EF92AB;
+    border: none;
+    border-radius: 0px;
+    height: 48px;
+    width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  ">🛒
+    <span id="cartCount" style="
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    ">0</span>
+  </button>
+</div>
 
   <!-- Products Grid (container for grouped sections) -->
 <div id="productsGrid" style="
@@ -918,29 +929,40 @@
         <div id="checkoutSummary"></div>
       </div>
 
-      <div style="display: flex; gap: 10px;">
-        <button type="button" onclick="closeCheckout()" style="
-          flex: 1;
-          background: #ccc;
-          color: #333;
-          border: none;
-          padding: 15px;
-          border-radius: 8px;
-          font-size: 16px;
-          cursor: pointer;
-        ">Cancel</button>
-        
-        <button type="submit" style="
-          flex: 2;
-          background: #61134A;
-          color: white;
-          border: none;
-          padding: 15px;
-          border-radius: 8px;
-          font-size: 16px;
-          font-weight: bold;
-          cursor: pointer;
-        ">PLACE ORDER</button>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+  <button type="submit" style="
+    width: 100%;
+    background: #61134A;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  ">PLACE ORDER</button>
+  
+  <button type="button" onclick="showUserOrders(); closeCheckout();" style="
+    width: 100%;
+    background: #E58BBE;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  ">VIEW MY ORDERS</button>
+  
+  <button type="button" onclick="closeCheckout()" style="
+    width: 100%;
+    background: #ccc;
+    color: #333;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  ">Cancel</button>
       </div>
     </form>
   </div>
@@ -2617,17 +2639,11 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     confirmButtonText: "Continue Shopping",
     confirmButtonColor: "#61134A",
     showCancelButton: true,
-    cancelButtonText: "View My Orders",
+    cancelButtonText: "false",
     cancelButtonColor: "#E58BBE",
     customClass: {
       popup: "swal2-rounded"
     }
-  }).then((result) => {
-    if (result.dismiss === Swal.DismissReason.cancel) {
-      // Show user's orders or redirect to orders page
-      showUserOrders(); // You'll need to implement this function
-    }
-  });
     }
 
 
