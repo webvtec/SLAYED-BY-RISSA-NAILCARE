@@ -445,7 +445,7 @@ box-sizing: border-box;
   <input type="number" id="productPriceInput" placeholder="Price (e.g. 29.99)" step="0.01" min="0">
   <input type="text" id="productImageInput" placeholder="Product Image URL">
 
-  <!-- Product Section Select -->
+  <!-- ✅ Now correctly placed in Products Section -->
   <label for="productSectionSelect">Select Product Section</label>
   <select id="productSectionSelect">
     <option value="Hair Products">Hair Products</option>
@@ -623,32 +623,29 @@ box-sizing: border-box;
     function addPhotoUrl() {
   const urlInput = document.getElementById('photoUrlInput');
   const categorySelect = document.getElementById('photoCategorySelect');
-  const sectionSelect = document.getElementById('productSectionSelect');
   const url = urlInput.value.trim();
   const category = categorySelect.value.trim();
-  const section = sectionSelect.value.trim();
 
-  if (url === '' || category === '' || section === '') {
-    alert('Please enter a valid image URL and select both category and product section.');
+  if (url === '' || category === '') {
+    alert('Please enter a valid image URL and select a category.');
     return;
   }
 
   db.collection('gallery').add({ 
     url: url, 
-    category: category,
-    section: section 
+    category: category
   })
     .then(() => {
       urlInput.value = '';
       categorySelect.value = '';
-      sectionSelect.value = '';
       alert('Photo added successfully!');
     })
     .catch(error => {
       console.error("Error adding document: ", error);
       alert('Error adding photo: ' + error.message);
     });
-    }
+}
+
 
     
     function loadGallery() {
