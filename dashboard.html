@@ -1108,10 +1108,10 @@ function removeUnavailableDate(id) { db.collection('unavailableDays').doc(id).de
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
     loadGallery();
+    showSection('reservationsPage');  // ← This line already exists
     loadReservations();
     loadUnavailableDates();
-    loadProducts(); // ✅ Make sure this is called when authenticated
-    showSection('productsSection'); // Start with products section to test
+    loadProducts();
   } else {
     window.location.href = 'index.html';
   }
