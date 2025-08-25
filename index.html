@@ -11,7 +11,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
     body {
       font-family: 'Zilla Slab', serif;
@@ -290,16 +290,16 @@
   background: #fff;
   width: 90%;
   max-width: 500px;
-  max-height: 80vh;   /* ✅ prevent overflowing screen */
+  max-height: 80vh;   /* prevent overflowing screen */
   border-radius: 12px;
-  overflow-y: auto;   /* ✅ allow scrolling when content is tall */
+  overflow-y: auto;   /* allow scrolling when content is tall */
   position: relative;
   padding: 20px;
 }
 
 /* Close button */
 #closeBookings {
-  position: sticky;   /* ✅ stays visible when scrolling */
+  position: sticky;   /* stays visible when scrolling */
   top: 0;
   float: right;
   background: transparent;
@@ -454,12 +454,12 @@
 </div>
 
     
-<!-- ✅ Gallery Section (Now Wrapped) -->
+<!-- Gallery Section (Now Wrapped) -->
 <div class="content-section active" id="gallerySection">
 <h2 style="text-align:center; margin-top:60px;"></h2>
 <div id="galleryDisplay"></div>
 </div>
-<!-- ✅ Menu -->
+<!-- Menu -->
 <div class="menu" id="menu">
 <a onclick="showSection('gallerySection'); closeMenu();">💅🏽 DESIGNS</a>
 <a onclick="showSection('bookingSection'); closeMenu();">📆 BOOKING</a>
@@ -536,6 +536,8 @@
     </a>
 </div>
 </div>
+
+
 
     <!-- Add this booking confirmation modal right after your existing modals -->
 <div id="bookingModal" style="
