@@ -623,6 +623,11 @@ box-sizing: border-box;
     snapshot.forEach(doc => {
       const booking = doc.data();
 
+      // ✅ Filter out bookings with "Hairstyle" in the service field
+      if (booking.service && booking.service.toLowerCase().includes('hairstyle')) {
+        return; // Skip this booking
+      }
+
       // Handle both Timestamp and string-based dates
       let bDate;
       if (typeof booking.date === "string") {
@@ -630,11 +635,6 @@ box-sizing: border-box;
         bDate = new Date(y, m - 1, d);
       } else {
         return; // skip if invalid
-      }
-
-      / ✅ Filter out bookings with "Hairstyle" in the service field
-      if (booking.service && booking.service.toLowerCase().includes('hairstyle')) {
-        return; // Skip this booking
       }
 
       const bY = bDate.getFullYear();
@@ -709,8 +709,8 @@ box-sizing: border-box;
     renderGroup("Upcoming", upcomingList, "upcoming");
     renderGroup("Past", pastList, "past");
   });
-}
-
+    }
+    
 // Helper function to convert time string to minutes for sorting
 function convertTimeToMinutes(timeStr) {
   if (!timeStr) return 0;
