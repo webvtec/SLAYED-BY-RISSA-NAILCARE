@@ -729,17 +729,15 @@
     </div>
   </div>
 
-  <!-- Products Grid -->
-  <div id="productsGrid" style="
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+  <!-- Products Grid (container for grouped sections) -->
+<div id="productsGrid" style="
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-  ">
-    <!-- Products will be loaded here -->
-  </div>
+">
+    <!-- Products grouped by category will be loaded here -->
+</div>
+
 
   <!-- Empty State -->
   <div id="productsEmpty" style="
@@ -2155,78 +2153,68 @@ document.addEventListener('DOMContentLoaded', function() {
 let cart = [];
 
 // Updated loadProducts function with better error handling
+
 function loadProducts() {
-  const grid = document.getElementById('productsGrid');
-  const empty = document.getElementById('productsEmpty');
-  
-  console.log('Loading products...'); // Debug log
-  
-  // Show loading state
-  grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Loading products...</div>';
-  empty.style.display = 'none';
-  
-  // Try to load all products first, then filter
-  db.collection('products')
-    .onSnapshot(snapshot => {
-      console.log('Products query returned:', snapshot.size, 'documents'); // Debug log
-      
-      grid.innerHTML = '';
-      
-      if (snapshot.empty) {
-        console.log('No products found in database'); // Debug log
-        empty.style.display = 'block';
-        return;
-      }
-      
-      empty.style.display = 'none';
-      let activeProductsCount = 0;
-      
-      snapshot.forEach(doc => {
-        const product = doc.data();
-        console.log('Product data:', product); // Debug log
-        
-        // Check if product should be displayed (active or no active field)
-        if (product.active !== false) { // Show if active is true or undefined
-          const productCard = createProductCard(doc.id, product);
-          grid.appendChild(productCard);
-          activeProductsCount++;
-        }
-      });
-      
-      console.log('Active products displayed:', activeProductsCount); // Debug log
-      
-      // If no active products, show empty state
-      if (activeProductsCount === 0) {
-        empty.style.display = 'block';
-        grid.innerHTML = '';
-      }
-    }, error => {
-      console.error('Error loading products:', error);
-      grid.innerHTML = `
-        <div style="
-          text-align: center; 
-          padding: 40px; 
-          color: #f44336;
-          background: #ffebee;
-          border-radius: 8px;
-          margin: 20px;
-        ">
-          <h3>Error Loading Products</h3>
-          <p>${error.message}</p>
-          <button onclick="loadProducts()" style="
-            background: #E58BBE;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-          ">Try Again</button>
-        </div>
-      `;
+  const container = document.getElementById('productsGrid');
+  const emptyState = document.getElementById('productsEmpty');
+  container.innerHTML = '';
+
+  db.collection('products').where("active", "==", true).onSnapshot(snapshot => {
+    container.innerHTML = '';
+
+    if (snapshot.empty) {
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    emptyState.style.display = 'none';
+
+    // Group products by section
+    const sections = {};
+
+    snapshot.forEach(doc => {
+      const product = doc.data();
+      const section = product.section || 'Other';
+      if (!sections[section]) sections[section] = [];
+      sections[section].push({ id: doc.id, ...product });
     });
+
+    // Render each section with title + grid
+    for (const section in sections) {
+      const sectionDiv = document.createElement('div');
+      sectionDiv.classList.add('product-section');
+      sectionDiv.innerHTML = `
+        <h2 style="color:#FE5DC7; margin:30px 10px 15px;">${section}</h2>
+        <div class="product-grid" style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px;
+          margin-bottom: 40px;
+        " id="grid-${section}"></div>
+      `;
+      container.appendChild(sectionDiv);
+
+      const grid = sectionDiv.querySelector(`#grid-${section}`);
+
+      sections[section].forEach(product => {
+        grid.innerHTML += `
+          <div style="background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:15px; text-align:center;">
+            <img src="${product.image}" alt="${product.name}" style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+            <h3 style="color:#61134A;">${product.name}</h3>
+            <p style="color:#555; font-size:14px;">${product.description || ''}</p>
+            <p style="color:#E58BBE; font-weight:bold;">$${product.price}</p>
+            <button onclick="addToCart('${product.id}', '${product.name}', ${product.price}, '${product.image}')"
+              style="background:#E58BBE; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;">
+              Add to Cart
+            </button>
+          </div>
+        `;
+      });
+    }
+  });
 }
 
+    
 // Also update createProductCard to handle missing fields
 function createProductCard(id, product) {
   const card = document.createElement('div');
