@@ -2160,7 +2160,7 @@ function loadProducts() {
   const productsGrid = document.getElementById("productsGrid");
   const emptyState = document.getElementById("productsEmpty");
 
-  db.collection("products").where("active", "==", true).onSnapshot(snapshot => {
+  db.collection("products").onSnapshot(snapshot => {
     productsGrid.innerHTML = "";
 
     if (snapshot.empty) {
@@ -2172,7 +2172,7 @@ function loadProducts() {
 
     const grouped = {};
     snapshot.forEach(doc => {
-      const product = doc.data();
+      const product = { id: doc.id, ...doc.data() };
       const section = product.section || "Other";
 
       if (!grouped[section]) {
@@ -2190,19 +2190,8 @@ function loadProducts() {
       grid.style.gridTemplateColumns = "repeat(auto-fit, minmax(250px, 1fr))";
       grid.style.gap = "20px";
 
-      grouped[section].forEach(p => {
-        const card = document.createElement("div");
-        card.style.background = "#fff";
-        card.style.padding = "15px";
-        card.style.borderRadius = "10px";
-        card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
-        card.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" 
-               style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
-          <h3 style="color:#61134A; margin:10px 0;">${p.name}</h3>
-          <p style="font-size:14px; color:#555;">${p.description || ""}</p>
-          <p style="font-weight:bold; color:#E58BBE;">$${p.price}</p>
-        `;
+      grouped[section].forEach(product => {
+        const card = createProductCard(product.id, product);
         grid.appendChild(card);
       });
 
@@ -2211,10 +2200,6 @@ function loadProducts() {
     }
   });
 }
-
-// 🚀 Load products when page is ready
-window.addEventListener("load", loadProducts);
-
 
 
 // ✅ Helper to render a single product card
@@ -2248,17 +2233,14 @@ function showSection(sectionId) {
   );
   document.getElementById(sectionId).classList.add('active');
 
-  if (sectionId === 'productsSection') {
+  if (sectionId === 'gallerySection') {
+    loadGallery('galleryDisplay');
+  } else if (sectionId === 'reviewsSection') {
+    loadReviews(currentUser);
+  } else if (sectionId === 'productsSection') {
     loadProducts();
   }
 }
-
-// ✅ Auto-load products if Products is default active
-window.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('productsSection').classList.contains('active')) {
-    loadProducts();
-  }
-});
 
     
 // Also update createProductCard to handle missing fields
@@ -2272,18 +2254,17 @@ function createProductCard(id, product) {
     transition: transform 0.3s ease;
   `;
   
-  // Handle missing fields with defaults
   const name = product.name || 'Unnamed Product';
   const description = product.description || 'No description available';
   const price = product.price || 0;
-  const imageUrl = product.imageUrl || product.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+  const imageUrl = product.imageUrl || product.image || 'https://via.placeholder.com/200x200/ddd/999?text=No+Image';
   
   card.innerHTML = `
     <img src="${imageUrl}" alt="${name}" style="
       width: 100%;
       height: 200px;
       object-fit: cover;
-    " onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';">
+    " onerror="this.src='https://via.placeholder.com/200x200/ddd/999?text=No+Image';">
     
     <div style="padding: 20px;">
       <h3 style="
@@ -2574,30 +2555,6 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
       console.error('Error placing order:', error);
       alert('Failed to place order. Please try again.');
     });
-}
-
-// Call loadProducts when the Products page is shown
-function showSection(sectionId) {
-  // Hide all sections
-  document.querySelectorAll('.content-section').forEach(section =>
-    section.classList.remove('active')
-  );
-
-  // Show the selected section
-  document.getElementById(sectionId).classList.add('active');
-
-  // Special cases
-  if (sectionId === "productsSection") {
-    loadProducts();   // ✅ fetch products when products section is shown
-  }
-
-  if (sectionId === "gallerySection") {
-    loadGallery();    // (if you already have a gallery load function)
-  }
-
-  if (sectionId === "servicesSection") {
-    loadServices();   // (if you already have a services load function)
-  }
 }
 
 
