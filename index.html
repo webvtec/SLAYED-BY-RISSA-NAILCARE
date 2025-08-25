@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>TISHAYS NAILPLACE</title>
+<title>SLAYED BY RISSA NAILS</title>
 <!-- Firebase Scripts -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -309,13 +309,90 @@
   z-index: 10000;
 }
 
+/* Welcome Modal Styles */
+#welcomeModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+}
+
+#welcomeModalContent {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 30px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.5s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#welcomeModalContent h2 {
+  color: white;
+  font-size: 28px;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#welcomeModalContent p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  margin-bottom: 30px;
+  line-height: 1.4;
+}
+
+.service-button {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  margin: 15px 0;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: 'Zilla Slab', serif;
+}
+
+.service-button:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.service-button:active {
+  transform: translateY(0);
+}
+
     
   </style>
 </head>
 <body>
 <div class="header-bar">
 <button class="menu-button" onclick="toggleMenu()">☰</button>
-<div class="header-title">TISHAYS NAILPLACE</div>
+<div class="header-title">SLAYED BY RISSA NAILS</div>
 <a class="location-button" href="https://maps.app.goo.gl/Y5KEuKuHc6AVJY1BA" target="_blank">📍</a>
 </div>
 <!-- ✅ Gallery Section (Now Wrapped) -->
@@ -344,6 +421,22 @@
    href="javascript:void(0);">
    PAYMENT INFO
 </a>
+
+    <!-- Welcome Modal -->
+<div id="welcomeModal">
+  <div id="welcomeModalContent">
+    <h2>✨ WELCOME TO SLAYED BY RISSA ✨</h2>
+    <p>Which service are you looking for today?</p>
+    
+    <button class="service-button" onclick="selectHairService()">
+      💇‍♀️ HAIRDRESSING SERVICE
+    </button>
+    
+    <button class="service-button" onclick="selectNailService()">
+      💅 NAILCARE SERVICE
+    </button>
+  </div>
+</div>
     
 <!-- Another Separator Line -->
 <div class="separator-line"></div>
@@ -1747,7 +1840,22 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// Welcome Modal Functions
+function selectHairService() {
+  // Replace 'your-hair-website-url.html' with your actual hair service website URL
+  window.location.href = 'https://webvtec.github.io/SLAYED-BY-RISSA-HAIRCARE/index.html';
+}
 
+function selectNailService() {
+  // Hide the welcome modal and continue to current nail website
+  document.getElementById('welcomeModal').style.display = 'none';
+}
+
+// Show welcome modal when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Show the welcome modal immediately when page loads
+  document.getElementById('welcomeModal').style.display = 'flex';
+});
     
   </script>
 </body>
