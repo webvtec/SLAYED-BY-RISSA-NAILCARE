@@ -624,10 +624,7 @@ box-sizing: border-box;
     snapshot.forEach(doc => {
       const booking = doc.data();
 
-      // ✅ Filter out bookings with "Hairstyle" in the service field
-      if (booking.service && (booking.service.toLowerCase().includes('hair') || booking.service.toLowerCase().includes('braid') || booking.service.toLowerCase().includes('wig') || booking.service.toLowerCase().includes('corn row') || booking.service.toLowerCase().includes('extension'))) {
-        return; // Skip this booking
-      }
+    
 
       // Handle both Timestamp and string-based dates
       let bDate;
