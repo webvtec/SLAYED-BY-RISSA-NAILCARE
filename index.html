@@ -426,6 +426,23 @@
     min-height: 80vh;
   }
 }
+
+    .cart-button {
+  position: relative;
+  background-color: #EF92AB;
+  color: #000000;
+  border: none;
+  border-radius: 0px;
+  cursor: pointer;
+  height: 48px;
+  width: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  padding: 0;
+  top: 48px;
+    }
     
   </style>
 </head>
@@ -433,8 +450,29 @@
 <div class="header-bar">
 <button class="menu-button" onclick="toggleMenu()">☰</button>
 <div class="header-title">SLAYED BY RISSA NAILS</div>
-<a class="location-button" href="https://maps.app.goo.gl/Y5KEuKuHc6AVJY1BA" target="_blank">📍</a>
+<div style="position: absolute; right: 0; top: 0;">
+  <a class="location-button" href="https://maps.app.goo.gl/Y5KEuKuHc6AVJY1BA" target="_blank">📍</a>
+  <button class="cart-button" onclick="toggleCart()">🛒
+    <span id="cartCount" style="
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    ">0</span>
+  </button>
 </div>
+</div>
+
+    
 <!-- ✅ Gallery Section (Now Wrapped) -->
 <div class="content-section active" id="gallerySection">
 <h2 style="text-align:center; margin-top:60px;"></h2>
@@ -696,37 +734,8 @@
 
 <!-- Products Section -->
 <div class="content-section" id="productsSection">
-  <div style="display: flex; font-size: 14px; justify-content: space-between; align-items: center; margin: 60px 20px 20px 20px;">
-    <h1 style="color: #FE5DC7; margin: 0;">PRODUCTS SECTION</h1>
-    
-    <!-- Cart Icon -->
-    <div onclick="toggleCart()" style="
-      position: relative;
-      cursor: pointer;
-      background: #E58BBE;
-      padding: 12px;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    ">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-        <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z"/>
-      </svg>
-      <span id="cartCount" style="
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: red;
-        color: white;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: bold;
-      ">0</span>
-    </div>
+  <div style="margin: 60px 20px 20px 20px;">
+    <h1 style="color: #FE5DC7; margin: 0; text-align: center;">NAIL PRODUCTS</h1>
   </div>
 
   <!-- Products Grid (container for grouped sections) -->
