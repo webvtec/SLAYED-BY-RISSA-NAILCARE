@@ -690,6 +690,256 @@
 <div id="reviewsContainer" style="max-width:100%; margin:20px auto;"></div>
 </div>
 
+
+
+    <!-- Add this to your main index.html file after the reviewsSection div -->
+
+<!-- Products Section -->
+<div class="content-section" id="productsSection">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin: 60px 20px 20px 20px;">
+    <h1 style="color: #FE5DC7; margin: 0;">NAIL PRODUCTS</h1>
+    
+    <!-- Cart Icon -->
+    <div onclick="toggleCart()" style="
+      position: relative;
+      cursor: pointer;
+      background: #E58BBE;
+      padding: 12px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    ">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z"/>
+      </svg>
+      <span id="cartCount" style="
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+      ">0</span>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div id="productsGrid" style="
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  ">
+    <!-- Products will be loaded here -->
+  </div>
+
+  <!-- Empty State -->
+  <div id="productsEmpty" style="
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    display: none;
+  ">
+    <h3>No Products Available</h3>
+    <p>Check back soon for new products!</p>
+  </div>
+</div>
+
+<!-- Shopping Cart Modal -->
+<div id="cartModal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+">
+  <div style="
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  ">
+    <!-- Cart Header -->
+    <div style="
+      background: #E58BBE;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    ">
+      <h3 style="margin: 0; font-size: 20px;">Shopping Cart</h3>
+      <button onclick="toggleCart()" style="
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+      ">×</button>
+    </div>
+
+    <!-- Cart Items -->
+    <div id="cartItems" style="
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+    ">
+      <!-- Cart items will be populated here -->
+    </div>
+
+    <!-- Cart Footer -->
+    <div style="
+      background: #f8f8f8;
+      padding: 20px;
+      border-top: 1px solid #eee;
+    ">
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: bold;
+      ">
+        <span>Total:</span>
+        <span id="cartTotal" style="color: #E58BBE;">$0.00</span>
+      </div>
+      
+      <button onclick="proceedToCheckout()" style="
+        width: 100%;
+        background: #61134A;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+      ">
+        PROCEED TO CHECKOUT
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div id="checkoutModal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 10001;
+  justify-content: center;
+  align-items: center;
+">
+  <div style="
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    border-radius: 15px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  ">
+    <!-- Checkout Header -->
+    <div style="
+      background: #61134A;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    ">
+      <h3 style="margin: 0; font-size: 22px;">Checkout</h3>
+    </div>
+
+    <!-- Checkout Form -->
+    <form onsubmit="submitOrder(event)" style="padding: 30px;">
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name:</label>
+        <input id="checkoutName" required type="text" style="
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 16px;
+        ">
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number:</label>
+        <input id="checkoutPhone" required type="tel" style="
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 16px;
+        ">
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Delivery Address:</label>
+        <textarea id="checkoutAddress" required rows="3" style="
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 16px;
+          resize: vertical;
+        "></textarea>
+      </div>
+
+      <!-- Order Summary -->
+      <div style="
+        background: #f8f8f8;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      ">
+        <h4 style="margin: 0 0 10px 0; color: #333;">Order Summary:</h4>
+        <div id="checkoutSummary"></div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" onclick="closeCheckout()" style="
+          flex: 1;
+          background: #ccc;
+          color: #333;
+          border: none;
+          padding: 15px;
+          border-radius: 8px;
+          font-size: 16px;
+          cursor: pointer;
+        ">Cancel</button>
+        
+        <button type="submit" style="
+          flex: 2;
+          background: #61134A;
+          color: white;
+          border: none;
+          padding: 15px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: bold;
+          cursor: pointer;
+        ">PLACE ORDER</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <!-- Admin Login Modal -->
 <div id="adminLoginModal" style="
   display:none;
@@ -1898,6 +2148,361 @@ document.addEventListener('DOMContentLoaded', function() {
   // Show the welcome modal immediately when page loads
   document.getElementById('welcomeModal').style.display = 'flex';
 });
+
+
+    
+// Shopping cart functionality
+let cart = [];
+
+function loadProducts() {
+  const grid = document.getElementById('productsGrid');
+  const empty = document.getElementById('productsEmpty');
+  
+  db.collection('products')
+    .where('active', '==', true)
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snapshot => {
+      grid.innerHTML = '';
+      
+      if (snapshot.empty) {
+        empty.style.display = 'block';
+        return;
+      }
+      
+      empty.style.display = 'none';
+      
+      snapshot.forEach(doc => {
+        const product = doc.data();
+        const productCard = createProductCard(doc.id, product);
+        grid.appendChild(productCard);
+      });
+    });
+}
+
+function createProductCard(id, product) {
+  const card = document.createElement('div');
+  card.style.cssText = `
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  `;
+  
+  card.innerHTML = `
+    <img src="${product.imageUrl}" alt="${product.name}" style="
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    ">
+    
+    <div style="padding: 20px;">
+      <h3 style="
+        margin: 0 0 10px 0;
+        color: #333;
+        font-size: 18px;
+      ">${product.name}</h3>
+      
+      <p style="
+        color: #666;
+        font-size: 14px;
+        line-height: 1.4;
+        margin: 0 0 15px 0;
+      ">${product.description}</p>
+      
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      ">
+        <span style="
+          font-size: 20px;
+          font-weight: bold;
+          color: #E58BBE;
+        ">$${product.price}</span>
+        
+        <button onclick="addToCart('${id}', '${product.name}', ${product.price}, '${product.imageUrl}')" style="
+          background: #61134A;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+        ">Add to Cart</button>
+      </div>
+    </div>
+  `;
+  
+  return card;
+}
+
+function addToCart(id, name, price, imageUrl) {
+  const existingItem = cart.find(item => item.id === id);
+  
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.push({
+      id,
+      name,
+      price,
+      imageUrl,
+      quantity: 1
+    });
+  }
+  
+  updateCartDisplay();
+  
+  // Show success message
+  const button = event.target;
+  const originalText = button.textContent;
+  button.textContent = 'Added!';
+  button.style.background = '#4CAF50';
+  
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.style.background = '#61134A';
+  }, 1500);
+}
+
+function updateCartDisplay() {
+  const count = cart.reduce((total, item) => total + item.quantity, 0);
+  document.getElementById('cartCount').textContent = count;
+  
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+  
+  renderCartItems();
+}
+
+function renderCartItems() {
+  const container = document.getElementById('cartItems');
+  
+  if (cart.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 40px; color: #666;">
+        <p>Your cart is empty</p>
+        <button onclick="toggleCart()" style="
+          background: #E58BBE;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+        ">Continue Shopping</button>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = cart.map(item => `
+    <div style="
+      display: flex;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+    ">
+      <img src="${item.imageUrl}" alt="${item.name}" style="
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-right: 15px;
+      ">
+      
+      <div style="flex: 1;">
+        <h4 style="margin: 0 0 5px 0; font-size: 16px;">${item.name}</h4>
+        <p style="margin: 0; color: #666;">$${item.price} each</p>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})" style="
+          background: #ddd;
+          border: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 4px;
+          cursor: pointer;
+        ">-</button>
+        
+        <span style="font-weight: bold; min-width: 20px; text-align: center;">${item.quantity}</span>
+        
+        <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})" style="
+          background: #ddd;
+          border: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 4px;
+          cursor: pointer;
+        ">+</button>
+        
+        <button onclick="removeFromCart('${item.id}')" style="
+          background: #ff4444;
+          color: white;
+          border: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 4px;
+          cursor: pointer;
+          margin-left: 10px;
+        ">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateQuantity(id, newQuantity) {
+  if (newQuantity <= 0) {
+    removeFromCart(id);
+    return;
+  }
+  
+  const item = cart.find(item => item.id === id);
+  if (item) {
+    item.quantity = newQuantity;
+    updateCartDisplay();
+  }
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(item => item.id !== id);
+  updateCartDisplay();
+}
+
+function toggleCart() {
+  const modal = document.getElementById('cartModal');
+  const isVisible = modal.style.display === 'flex';
+  modal.style.display = isVisible ? 'none' : 'flex';
+  
+  if (!isVisible) {
+    updateCartDisplay();
+  }
+}
+
+function proceedToCheckout() {
+  if (cart.length === 0) {
+    alert('Your cart is empty!');
+    return;
+  }
+  
+  // Fill checkout summary
+  const summary = document.getElementById('checkoutSummary');
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  summary.innerHTML = cart.map(item => `
+    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+      <span>${item.name} (x${item.quantity})</span>
+      <span>$${(item.price * item.quantity).toFixed(2)}</span>
+    </div>
+  `).join('') + `
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      font-weight: bold;
+      color: #E58BBE;
+    ">
+      <span>Total:</span>
+      <span>$${total.toFixed(2)}</span>
+    </div>
+  `;
+  
+  document.getElementById('cartModal').style.display = 'none';
+  document.getElementById('checkoutModal').style.display = 'flex';
+}
+
+function closeCheckout() {
+  document.getElementById('checkoutModal').style.display = 'none';
+}
+
+function submitOrder(event) {
+  event.preventDefault();
+  
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    if (confirm("You must be logged in to place an order. Click OK to log in.")) {
+      window.location.href = 'login.html';
+    }
+    return;
+  }
+  
+  const orderData = {
+    uid: user.uid,
+    customerName: document.getElementById('checkoutName').value.trim(),
+    customerPhone: document.getElementById('checkoutPhone').value.trim(),
+    deliveryAddress: document.getElementById('checkoutAddress').value.trim(),
+    items: cart,
+    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+    status: 'pending',
+    orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber: 'ORD-' + Date.now().toString().slice(-6)
+  };
+  
+  db.collection('orders').add(orderData)
+    .then(() => {
+      // Send Telegram notification
+      const telegramMessage = `🛒 NEW PRODUCT ORDER
+
+📋 Order #: ${orderData.orderNumber}
+👤 Customer: ${orderData.customerName}
+📞 Phone: ${orderData.customerPhone}
+📍 Address: ${orderData.deliveryAddress}
+
+🛍️ Items:
+${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+
+💰 Total: $${orderData.total.toFixed(2)}`;
+
+      const telegramBotToken = "7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8";
+      const telegramChatId = "-1002734216867";
+
+      return fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: telegramChatId,
+          text: telegramMessage,
+          parse_mode: "HTML"
+        })
+      });
+    })
+    .then(() => {
+      alert(`Order placed successfully! Order #: ${orderData.orderNumber}\n\nYou will be contacted shortly for payment and delivery details.`);
+      
+      // Clear cart and close modals
+      cart = [];
+      updateCartDisplay();
+      closeCheckout();
+      
+      // Reset form
+      document.querySelector('#checkoutModal form').reset();
+    })
+    .catch(error => {
+      console.error('Error placing order:', error);
+      alert('Failed to place order. Please try again.');
+    });
+}
+
+// Initialize products when section is shown
+function showSection(sectionId) {
+  document.querySelectorAll('.content-section').forEach(section =>
+    section.classList.remove('active')
+  );
+  document.getElementById(sectionId).classList.add('active');
+
+  if (sectionId === 'gallerySection') {
+    loadGallery('galleryDisplay');
+  } else if (sectionId === 'reviewsSection') {
+    loadReviews(currentUser);
+  } else if (sectionId === 'productsSection') {
+    loadProducts();
+  }
+}
+
+
     
   </script>
 </body>
