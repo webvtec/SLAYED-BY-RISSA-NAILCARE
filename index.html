@@ -2155,12 +2155,13 @@ let cart = [];
 // Updated loadProducts function with better error handling
 
 
+
 function loadProducts() {
   const productsGrid = document.getElementById("productsGrid");
   const emptyState = document.getElementById("productsEmpty");
 
   db.collection("products").where("active", "==", true).onSnapshot(snapshot => {
-    productsGrid.innerHTML = ""; // clear grid first
+    productsGrid.innerHTML = "";
 
     if (snapshot.empty) {
       emptyState.style.display = "block";
@@ -2169,7 +2170,6 @@ function loadProducts() {
       emptyState.style.display = "none";
     }
 
-    // Group products by section
     const grouped = {};
     snapshot.forEach(doc => {
       const product = doc.data();
@@ -2181,7 +2181,6 @@ function loadProducts() {
       grouped[section].push(product);
     });
 
-    // Render grouped sections
     for (const section in grouped) {
       const sectionDiv = document.createElement("div");
       sectionDiv.innerHTML = `<h2 style="color:#E58BBE; margin:20px 0;">${section}</h2>`;
@@ -2198,14 +2197,11 @@ function loadProducts() {
         card.style.borderRadius = "10px";
         card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
         card.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
+          <img src="${p.image}" alt="${p.name}" 
+               style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
           <h3 style="color:#61134A; margin:10px 0;">${p.name}</h3>
           <p style="font-size:14px; color:#555;">${p.description || ""}</p>
           <p style="font-weight:bold; color:#E58BBE;">$${p.price}</p>
-          <button onclick="addToCart('${p.name}', ${p.price}, '${p.image}')"
-            style="background:#E58BBE; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; width:100%;">
-            Add to Cart
-          </button>
         `;
         grid.appendChild(card);
       });
@@ -2216,10 +2212,9 @@ function loadProducts() {
   });
 }
 
-// Call this once when page loads
-window.onload = function() {
-  loadProducts();
-};
+// 🚀 Load products when page is ready
+window.addEventListener("load", loadProducts);
+
 
 
 // ✅ Helper to render a single product card
