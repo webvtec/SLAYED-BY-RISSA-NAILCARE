@@ -632,6 +632,11 @@ box-sizing: border-box;
         return; // skip if invalid
       }
 
+      / ✅ Filter out bookings with "Hairstyle" in the service field
+      if (booking.service && booking.service.toLowerCase().includes('hairstyle')) {
+        return; // Skip this booking
+      }
+
       const bY = bDate.getFullYear();
       const bM = bDate.getMonth();
       const bD = bDate.getDate();
