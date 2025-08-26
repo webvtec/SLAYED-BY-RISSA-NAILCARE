@@ -614,6 +614,10 @@ box-sizing: border-box;
     loadProducts();
   }
     }
+
+    function onSiteChange() {
+  loadGallery();
+    }
     
     function toggleTimeInputs() {
       const isAllDay = document.getElementById('allDayCheckbox').checked;
@@ -648,48 +652,8 @@ box-sizing: border-box;
 
 
     
-    function loadGallery() {
-      const galleryContainer = document.getElementById('adminGallery');
-      galleryContainer.innerHTML = '';
-
-      db.collection('gallery').onSnapshot((querySnapshot) => {
-        galleryContainer.innerHTML = '';
-
-        const categories = {};
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const imageUrl = data.url;
-          const category = data.category || 'Uncategorized';
-
-          if (!categories[category]) {
-            categories[category] = [];
-          }
-          categories[category].push({ imageUrl: imageUrl, docId: doc.id });
-        });
-
-        for (const category in categories) {
-          galleryContainer.innerHTML += `
-            <div class="gallery-category">
-              <h3>${category}</h3>
-              <div class="gallery-wrapper">
-                <div class="gallery-grid" id="gallery-${category}"></div>
-              </div>
-            </div>
-          `;
-
-          const categoryContainer = document.getElementById(`gallery-${category}`);
-
-          categories[category].forEach(item => {
-            categoryContainer.innerHTML += `
-              <div>
-                <img src="${item.imageUrl}" alt="Design">
-                <button class="remove-btn" onclick="removePhoto('${item.docId}')">X</button>
-              </div>
-            `;
-          });
-        }
-      });
+    function onSiteChange() {
+  loadGallery();
     }
 
     function removePhoto(docId) {
