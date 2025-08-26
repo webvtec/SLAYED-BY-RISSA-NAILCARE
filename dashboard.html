@@ -639,17 +639,22 @@ box-sizing: border-box;
     function addPhotoUrl() {
   const urlInput = document.getElementById('photoUrlInput');
   const categorySelect = document.getElementById('photoCategorySelect');
+  const siteSelect = document.getElementById('siteSelect'); // Get the site selector
+  
   const url = urlInput.value.trim();
   const category = categorySelect.value.trim();
+  const selectedSite = siteSelect.value; // Get selected site
 
   if (url === '' || category === '') {
     alert('Please enter a valid image URL and select a category.');
     return;
   }
 
+  // Include siteId when adding to database
   db.collection('gallery').add({ 
     url: url, 
-    category: category
+    category: category,
+    siteId: selectedSite  // Add this line
   })
     .then(() => {
       urlInput.value = '';
@@ -660,9 +665,7 @@ box-sizing: border-box;
       console.error("Error adding document: ", error);
       alert('Error adding photo: ' + error.message);
     });
-}
-
-
+    }
     
 
     function removePhoto(docId) {
