@@ -431,8 +431,8 @@
 
 .cart-button {
   position: absolute;
-  right: 0;     /* stick to the absolute edge */
-  top: 48px;    /* sits directly under location button */
+  top: 0;       /* stick to very top of section */
+  right: 0;     /* flush against right edge */
   background-color: #EF92AB;
   border: none;
   height: 48px;
@@ -448,8 +448,8 @@
 
 .cart-button #cartCount {
   position: absolute;
-  top: -6px;     /* slightly above cart */
-  right: -6px;   /* push badge outward so it shows past edge */
+  top: -6px;     
+  right: -6px;   /* push badge outward so it’s visible */
   background: red;
   color: white;
   border-radius: 50%;
@@ -462,6 +462,7 @@
   font-weight: bold;
   z-index: 1002;
 }
+
 
   </style>
 </head>
@@ -732,10 +733,9 @@
 
 
 
-    <!-- Add this to your main index.html file after the reviewsSection div -->
+    <div class="content-section" id="productsSection" style="position: relative;">
 
-<!-- Replace your products section with this corrected version -->
-<div class="content-section" id="productsSection" style="position: relative;">
+  <!-- Cart button (fixed to the top-right corner of this section) -->
   <button class="cart-button" onclick="toggleCart()">🛒
     <span id="cartCount">0</span>
   </button>
@@ -744,10 +744,6 @@
     <h1 style="color: #FE5DC7; margin: 0;">PRODUCTS</h1>
   </div>
 
-
-  
-    
-  <!-- Products Grid (container for grouped sections) -->
   <div id="productsGrid" style="
       padding: 20px;
       max-width: 1200px;
@@ -755,6 +751,9 @@
   ">
       <!-- Products grouped by category will be loaded here -->
   </div>
+
+</div>
+
 
   <!-- Empty State -->
   <div id="productsEmpty" style="
