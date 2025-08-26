@@ -2233,19 +2233,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Welcome Modal Functions
-function selectHairService() {
+function selectNailService() {
   // Close the welcome modal so the site is visible
   document.getElementById("welcomeModal").style.display = "none";
-
-  // Show default gallery/designs section
   showSection('gallerySection');
+
+  // Push state so back button reopens welcome modal
+  history.pushState({page: "hair"}, "", "");
 }
 
-function selectNailService() {
-  // Redirect user to the booking site (replace with your actual link)
-  window.location.href = "https://your-nail-booking-link.com";
+function selectHairService() {
+  // Push state before redirecting
+  history.pushState({page: "nails"}, "", "");
+  window.location.href = "https://webvtec.github.io/SLAYED-BY-RISSA-HAIRCARE/index.html";
 }
 
+// Listen for back button
+window.onpopstate = function(event) {
+  // Always bring back the welcome modal
+  document.getElementById("welcomeModal").style.display = "flex";
+};
+    
     
 // Shopping cart functionality
 let cart = [];
