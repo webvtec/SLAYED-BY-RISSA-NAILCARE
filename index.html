@@ -1253,7 +1253,7 @@ function selectPeriod(period) {
 
   // 🔹 Change "siteA" to "siteB" on your other website
   db.collection('gallery')
-    .where("siteId", "==", "siteB")
+    .where("siteId", "==", "siteA")
     .onSnapshot((querySnapshot) => {
       galleryContainer.innerHTML = '';
       const categories = {};
