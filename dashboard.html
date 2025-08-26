@@ -418,32 +418,37 @@ box-sizing: border-box;
 
 
 
-    <!-- Reservations Section -->
+<!-- Reservations Section -->
 <div class="admin-container content-section" id="reservationsPage">
-<h2>Reservations</h2>
-<div style="display:flex; gap:10px; margin-bottom:15px;"><input id="reservationSearch" placeholder="SEARCH RESERVATIONS..." type="text"/><button onclick="searchReservations()">Search</button></div><div id="reservationsList"></div>
-<div class="clear-container">
-<input id="clearInput" placeholder='Type "CONFIRM" to clear past reservations' type="text"/>
-<button onclick="clearReservations()">Clear Past Reservations</button>
-</div>
-</div>
-<!-- Unavailable Days Page -->
-<div class="admin-container content-section" id="unavailableDaysSection">
-<h2>Set Unavailable Days</h2>
-<input id="unavailableDateInput" type="date"/>
-<label><input checked="" id="allDayCheckbox" onchange="toggleTimeInputs()" type="checkbox"/> All Day</label>
-<div id="timeInputs" style="display: none;">
-<label>FROM:</label>
-<input id="startTimeInput" type="time"/>
-<label>UNTIL:</label>
-<input id="endTimeInput" type="time"/>
-</div>
-<button onclick="addUnavailableDate()">Add Unavailable Date</button>
-<h3>Unavailable Dates</h3>
-<ul id="unavailableDatesList"></ul>
+  <h2>Reservations</h2>
+  <div style="display:flex; gap:10px; margin-bottom:15px;">
+    <input id="reservationSearch" placeholder="SEARCH RESERVATIONS..." type="text"/>
+    <button onclick="searchReservations()">Search</button>
+  </div>
+  <div id="reservationsList"></div>
+  <div class="clear-container">
+    <input id="clearInput" placeholder='Type "CONFIRM" to clear past reservations' type="text"/>
+    <button onclick="clearReservations()">Clear Past Reservations</button>
+  </div>
 </div>
 
-  <!-- Products Management Section -->
+<!-- Unavailable Days Page -->
+<div class="admin-container content-section" id="unavailableDaysSection">
+  <h2>Set Unavailable Days</h2>
+  <input id="unavailableDateInput" type="date"/>
+  <label><input checked="" id="allDayCheckbox" onchange="toggleTimeInputs()" type="checkbox"/> All Day</label>
+  <div id="timeInputs" style="display: none;">
+    <label>FROM:</label>
+    <input id="startTimeInput" type="time"/>
+    <label>UNTIL:</label>
+    <input id="endTimeInput" type="time"/>
+  </div>
+  <button onclick="addUnavailableDate()">Add Unavailable Date</button>
+  <h3>Unavailable Dates</h3>
+  <ul id="unavailableDatesList"></ul>
+</div>
+
+<!-- Products Management Section -->
 <div class="admin-container content-section" id="productsSection">
   <h2 id="productFormTitle">Add New Product</h2>
   
@@ -452,7 +457,6 @@ box-sizing: border-box;
   <input type="number" id="productPriceInput" placeholder="Price (e.g. 29.99)" step="0.01" min="0">
   <input type="text" id="productImageInput" placeholder="Product Image URL">
 
-  <!-- ✅ Now correctly placed in Products Section -->
   <label for="productSectionSelect">Select Product Section</label>
   <select id="productSectionSelect">
     <option value="Hair Products">Hair Products</option>
@@ -460,12 +464,6 @@ box-sizing: border-box;
     <option value="Makeup Products">Makeup Products</option>
   </select>
 
-
-  <button onclick="addPhotoUrl()">Add Photo</button>
-
-  <div id="adminGallery"></div>
-</div>
-  
   <label style="display: block; margin: 10px 0;">
     <input type="checkbox" id="productActiveInput" checked> Active (visible to customers)
   </label>
@@ -476,7 +474,6 @@ box-sizing: border-box;
   <h3>Existing Products</h3>
   <div id="productsList"></div>
 </div>
-
 
   <!-- Conflict Modal -->
 <div id="conflictModal" style="
