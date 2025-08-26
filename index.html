@@ -464,6 +464,34 @@
 }
 
 
+.delivery-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.option-button {
+  flex: 1;
+  padding: 12px;
+  background-color: #FE5DC7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.option-button:hover {
+  background-color: #e04dad;
+}
+
+.option-button.active {
+  background-color: #EF92AB;
+}
+
+
+
   </style>
 </head>
 <body>
@@ -903,6 +931,36 @@
           font-size: 16px;
         ">
       </div>
+
+        <!-- Delivery Options -->
+<div class="delivery-options">
+  <button type="button" class="option-button" onclick="selectOption('knutsford')">Knutsford</button>
+  <button type="button" class="option-button" onclick="selectOption('bearers')">Bearers</button>
+</div>
+
+<!-- Knutsford Locations Dropdown (hidden by default) -->
+<div id="knutsfordDropdown" style="display:none; margin-top:15px;">
+  <label for="knutsfordLocation">Select Knutsford Location:</label>
+  <select id="knutsfordLocation" name="knutsfordLocation">
+    <option value="">-- Choose a location --</option>
+    <option>Kingston</option>
+    <option>Montego Bay</option>
+    <option>Ocho Rios</option>
+    <option>Mandeville</option>
+    <option>May Pen</option>
+    <option>Spanish Town</option>
+    <option>Negril</option>
+    <option>Portmore</option>
+    <option>Port Antonio</option>
+  </select>
+</div>
+
+<!-- Delivery Address Input (hidden by default) -->
+<div id="bearersInput" style="display:none; margin-top:15px;">
+  <label for="deliveryAddress">Delivery Address:</label>
+  <input type="text" id="deliveryAddress" name="deliveryAddress" placeholder="Enter delivery address">
+</div>
+
 
       <div style="margin-bottom: 20px;">
         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Delivery Address:</label>
@@ -2696,6 +2754,23 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
       });
     });
     }
+
+
+    function selectOption(option) {
+  // Reset button styles
+  document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('active'));
+
+  if (option === 'knutsford') {
+    document.getElementById('knutsfordDropdown').style.display = 'block';
+    document.getElementById('bearersInput').style.display = 'none';
+    document.querySelector('.option-button:nth-child(1)').classList.add('active');
+  } else if (option === 'bearers') {
+    document.getElementById('knutsfordDropdown').style.display = 'none';
+    document.getElementById('bearersInput').style.display = 'block';
+    document.querySelector('.option-button:nth-child(2)').classList.add('active');
+  }
+}
+
 
     
   </script>
