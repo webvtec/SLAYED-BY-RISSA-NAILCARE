@@ -932,41 +932,35 @@
         ">
       </div>
 
-<!-- Knutsford Locations Dropdown (hidden by default) -->
-<div class="delivery-options">
-  <button type="button" class="option-button" onclick="selectOption('knutsford')">Knutsford</button>
-  <button type="button" class="option-button" onclick="selectOption('bearers')">Bearers</button>
-</div>
-
-<div id="knutsfordDropdown" style="display:none; margin-top:15px;">
-  <label for="knutsfordLocation">Select Knutsford Location:</label>
-  <select id="knutsfordLocation" name="knutsfordLocation">
-    <option value="">-- Choose a location --</option>
-    <option>Negril, Westmoreland</option>
-    <option>Lucea, Hanover</option>
-    <option>Montego Bay Airport, St. James</option>
-    <option>Falmouth, Trelawny</option>
-    <option>Drax Hall, St. Ann</option>
-    <option>Angels (Spanish Town), St. Catherine</option>
-    <option>New Kingston, Kingston</option>
-    <option>Gutters, St. Elizabeth</option>
-    <option>Luana, St. Elizabeth</option>
-    <option>Mandeville, Manchester</option>
-    <option>Savanna-la-Mar, Westmoreland</option>
-    <option>May Pen, Clarendon</option>
-    <option>Port Antonio, Portland</option>
-    <option>Port Maria, St. Mary</option>
-    <option>Annotto Bay, St. Mary (Passenger Only)</option>
-    <option>Montego Bay (Pier 1), St. James (Courier Only)</option>
-    <option>Ocho Rios, St. Ann (Courier Only)</option>
-    <option>Washington Boulevard (Courier Only)</option>
-    <option>Harbour View, St. Andrew (Courier Only)</option>
-    <option>Portmore, St. Catherine (Courier Only)</option>
+<<!-- Knutsford Locations Dropdown (hidden by default) -->
+<div id="knutsfordDropdown" style="margin-bottom: 20px; display:none;">
+  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Select Knutsford Location:</label>
+  <select id="knutsfordLocation" style="
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+  ">
+    <option value="">-- Select a Location --</option>
+    <option value="Kingston - New Kingston">Kingston - New Kingston</option>
+    <option value="Kingston - Half Way Tree">Kingston - Half Way Tree</option>
+    <option value="Portmore">Portmore</option>
+    <option value="Spanish Town">Spanish Town</option>
+    <option value="Mandeville">Mandeville</option>
+    <option value="May Pen">May Pen</option>
+    <option value="Ocho Rios">Ocho Rios</option>
+    <option value="Montego Bay">Montego Bay</option>
+    <option value="Falmouth">Falmouth</option>
+    <option value="Savanna-La-Mar">Savanna-La-Mar</option>
+    <option value="Negril">Negril</option>
+    <option value="St. Ann’s Bay">St. Ann’s Bay</option>
+    <option value="Morant Bay">Morant Bay</option>
   </select>
 </div>
 
-
-      <div id="deliveryAddressBlock" style="margin-bottom: 20px; display:none;">
+<!-- Delivery Address Input (hidden by default) -->
+<div id="deliveryAddressBlock" style="margin-bottom: 20px; display:none;">
   <label style="display: block; margin-bottom: 5px; font-weight: bold;">Delivery Address:</label>
   <textarea id="checkoutAddress" rows="3" style="
     width: 100%;
@@ -2764,19 +2758,29 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     function selectOption(option) {
   document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('active'));
 
+  const knutsfordDropdown = document.getElementById('knutsfordDropdown');
+  const knutsfordSelect   = document.getElementById('knutsfordLocation');
+  const deliveryBlock     = document.getElementById('deliveryAddressBlock');
+  const deliveryTextarea  = document.getElementById('checkoutAddress');
+
   if (option === 'knutsford') {
-    document.getElementById('knutsfordDropdown').style.display = 'block';
-    document.getElementById('deliveryAddressBlock').style.display = 'none'; // hide textarea
+    knutsfordDropdown.style.display = 'block';
+    deliveryBlock.style.display = 'none';
+
+    knutsfordSelect.required = true;
+    deliveryTextarea.required = false;
+
     document.querySelector('.option-button:nth-child(1)').classList.add('active');
-    document.getElementById('checkoutAddress').required = false; // not required for knutsford
   } else if (option === 'bearers') {
-    document.getElementById('knutsfordDropdown').style.display = 'none';
-    document.getElementById('deliveryAddressBlock').style.display = 'block'; // show textarea
+    knutsfordDropdown.style.display = 'none';
+    deliveryBlock.style.display = 'block';
+
+    knutsfordSelect.required = false;
+    deliveryTextarea.required = true;
+
     document.querySelector('.option-button:nth-child(2)').classList.add('active');
-    document.getElementById('checkoutAddress').required = true; // required for bearers
   }
 }
-
 
     
   </script>
