@@ -452,6 +452,18 @@ box-sizing: border-box;
     <option value="Nail Products">Nail Products</option>
     <option value="Makeup Products">Makeup Products</option>
   </select>
+
+    <!-- 🔹 ADD THIS NEW SITE SELECTOR -->
+  <label for="siteSelect">SELECT SITE</label>
+  <select id="siteSelect">
+    <option value="siteA">Site A</option>
+    <option value="siteB">Site B</option>
+  </select>
+
+  <button onclick="addPhotoUrl()">Add Photo</button>
+
+  <div id="adminGallery"></div>
+</div>
   
   <label style="display: block; margin: 10px 0;">
     <input type="checkbox" id="productActiveInput" checked> Active (visible to customers)
@@ -652,9 +664,6 @@ box-sizing: border-box;
 
 
     
-    function onSiteChange() {
-  loadGallery();
-    }
 
     function removePhoto(docId) {
       db.collection('gallery').doc(docId).delete().catch((error) => {
@@ -666,9 +675,10 @@ box-sizing: border-box;
 
     function loadGallery() {
   const galleryContainer = document.getElementById('adminGallery');
-  const selectedSite = document.getElementById('siteSelect').value;
+  const selectedSite = document.getElementById('siteSelect').value; // 🔹 Get selected site
   galleryContainer.innerHTML = '';
 
+  // 🔹 Filter by siteId
   db.collection('gallery')
     .where("siteId", "==", selectedSite)
     .onSnapshot((querySnapshot) => {
@@ -1463,6 +1473,27 @@ function toggleProductStatus(productId, newStatus) {
     alert('Error updating product status: ' + error.message);
   });
 }
+
+
+    // 🔹 ADD THIS NEW FUNCTION
+function onSiteChange() {
+  loadGallery(); // Reload gallery for the selected site
+}
+
+// 🔹 ADD THIS EVENT LISTENER in your Firebase auth section
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    loadGallery();
+    showSection('reservationsPage');
+    loadReservations();
+    loadUnavailableDates();
+    
+    // 🔹 ADD EVENT LISTENER FOR SITE CHANGES
+    document.getElementById('siteSelect').addEventListener('change', onSiteChange);
+  } else {
+    window.location.href = 'index.html';
+  }
+});
 
   </script>
 </body>
