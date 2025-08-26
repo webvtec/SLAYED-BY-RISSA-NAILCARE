@@ -2595,9 +2595,9 @@ function closeCheckout() {
     return;
   }
 
-  const customerName = document.getElementById('checkoutName').value.trim();
-  const customerPhone = document.getElementById('checkoutPhone').value.trim();
-  const deliveryAddress = document.getElementById('checkoutAddress').value.trim();
+  const customerName = document.getElementById('name').value.trim();
+const customerPhone = document.getElementById('phone').value.trim();
+const deliveryAddress = document.getElementById('checkoutAddress').value.trim();
 
   // ✅ Validate required fields BEFORE saving or sending
   if (!customerName || !customerPhone || !deliveryAddress) {
