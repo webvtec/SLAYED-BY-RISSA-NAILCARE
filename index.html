@@ -962,74 +962,54 @@
       </div>
 
       <!-- Delivery Options -->
-      <div style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 10px; font-weight: bold;">Delivery Method:</label>
-        <div class="delivery-options" style="display: flex; gap: 10px; margin-bottom: 15px;">
-          <button type="button" class="option-button" onclick="selectOption('knutsford')" style="
-            flex: 1;
-            padding: 12px;
-            background-color: #FE5DC7;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-          ">Knutsford Pickup</button>
-          
-          <button type="button" class="option-button" onclick="selectOption('bearers')" style="
-            flex: 1;
-            padding: 12px;
-            background-color: #FE5DC7;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-          ">Bearers Delivery</button>
-        </div>
-      </div>
+      <!-- Delivery Method Selection -->
+<div style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: center;">
+  <button type="button" id="knutsfordBtn" 
+    style="flex:1; padding:12px; background:#E58BBE; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"
+    onclick="selectDeliveryOption('knutsford')">
+    Knutsford
+  </button>
+  <button type="button" id="bearersBtn" 
+    style="flex:1; padding:12px; background:#E58BBE; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"
+    onclick="selectDeliveryOption('bearers')">
+    Bearers
+  </button>
+</div>
 
-      <!-- Knutsford Locations Dropdown (hidden by default) -->
-      <div id="knutsfordDropdown" style="margin-bottom: 20px; display:none;">
-        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Select Knutsford Location:</label>
-        <select id="knutsfordLocation" style="
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          font-size: 16px;
-        ">
-          <option value="">-- Select a Location --</option>
-          <option value="Kingston - New Kingston">Kingston - New Kingston</option>
-          <option value="Kingston - Half Way Tree">Kingston - Half Way Tree</option>
-          <option value="Portmore">Portmore</option>
-          <option value="Spanish Town">Spanish Town</option>
-          <option value="Mandeville">Mandeville</option>
-          <option value="May Pen">May Pen</option>
-          <option value="Ocho Rios">Ocho Rios</option>
-          <option value="Montego Bay">Montego Bay</option>
-          <option value="Falmouth">Falmouth</option>
-          <option value="Savanna-La-Mar">Savanna-La-Mar</option>
-          <option value="Negril">Negril</option>
-          <option value="St. Ann's Bay">St. Ann's Bay</option>
-          <option value="Morant Bay">Morant Bay</option>
-        </select>
-      </div>
+<!-- Knutsford Dropdown (hidden by default) -->
+<div id="knutsfordDropdown" style="display:none; margin-bottom:20px;">
+  <label for="knutsfordLocation" style="display:block; margin-bottom:5px; font-weight:bold;">Select Knutsford Location:</label>
+  <select id="knutsfordLocation" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; font-size:16px;">
+    <option value="">-- Choose Location --</option>
+    <option>Kingston - New Kingston</option>
+    <option>Kingston - Half Way Tree</option>
+    <option>Spanish Town</option>
+    <option>Portmore</option>
+    <option>Ocho Rios</option>
+    <option>Montego Bay</option>
+    <option>Negril</option>
+    <option>Mandeville</option>
+    <option>May Pen</option>
+    <option>Savanna-la-Mar</option>
+    <option>Port Antonio</option>
+    <option>Falmouth</option>
+    <option>Morant Bay</option>
+    <option>St. Ann's Bay</option>
+  </select>
+</div>
 
-      <!-- Delivery Address Input (hidden by default) -->
-      <div id="deliveryAddressBlock" style="margin-bottom: 20px; display:none;">
-        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Delivery Address:</label>
-        <textarea id="checkoutAddress" rows="3" style="
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          font-size: 16px;
-          resize: vertical;
-        "></textarea>
-      </div>
+<!-- Bearers Delivery Address Input (hidden by default initially) -->
+<div id="bearersInput" style="display:none; margin-bottom:20px;">
+  <label for="checkoutAddress" style="display:block; margin-bottom:5px; font-weight:bold;">Delivery Address:</label>
+  <textarea id="checkoutAddress" rows="3" style="
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    resize: vertical;
+  "></textarea>
+</div>
 
       <!-- Order Summary -->
       <div style="
@@ -2816,18 +2796,55 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
   // Remove active class from all buttons
   document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('active'));
 
+  const knutsfordDropdown = document.getElementById('knutsfordDropdown');
+  const deliveryBlock = document.getElementById('deliveryAddressBlock'); // must match your HTML
+  const checkoutAddress = document.getElementById('checkoutAddress');
+  const knutsfordSelect = document.getElementById('knutsfordLocation');
+
   if (option === 'knutsford') {
-    document.getElementById('knutsfordDropdown').style.display = 'block';
-    document.getElementById('deliveryAddressBlock').style.display = 'none';
+    // Show Knutsford dropdown, hide delivery address
+    knutsfordDropdown.style.display = 'block';
+    deliveryBlock.style.display = 'none';
+
+    // Validation requirements
+    checkoutAddress.removeAttribute('required');
+    knutsfordSelect.setAttribute('required', 'true');
+
+    // Highlight button
     document.querySelector('.option-button:nth-child(1)').classList.add('active');
-    document.getElementById('checkoutAddress').required = false;
-    document.getElementById('knutsfordLocation').required = true;
+
   } else if (option === 'bearers') {
-    document.getElementById('knutsfordDropdown').style.display = 'none';
-    document.getElementById('deliveryAddressBlock').style.display = 'block';
+    // Show delivery address, hide Knutsford dropdown
+    knutsfordDropdown.style.display = 'none';
+    deliveryBlock.style.display = 'block';
+
+    // Validation requirements
+    checkoutAddress.setAttribute('required', 'true');
+    knutsfordSelect.removeAttribute('required');
+
+    // Highlight button
     document.querySelector('.option-button:nth-child(2)').classList.add('active');
-    document.getElementById('checkoutAddress').required = true;
-    document.getElementById('knutsfordLocation').required = false;
+  }
+}
+
+    function selectDeliveryOption(option) {
+  const knutsfordDropdown = document.getElementById("knutsfordDropdown");
+  const bearersInput = document.getElementById("bearersInput");
+  const knutsfordSelect = document.getElementById("knutsfordLocation");
+  const checkoutAddress = document.getElementById("checkoutAddress");
+
+  if (option === "knutsford") {
+    knutsfordDropdown.style.display = "block";
+    knutsfordSelect.setAttribute("required", "true");
+
+    bearersInput.style.display = "none";
+    checkoutAddress.removeAttribute("required");
+  } else if (option === "bearers") {
+    bearersInput.style.display = "block";
+    checkoutAddress.setAttribute("required", "true");
+
+    knutsfordDropdown.style.display = "none";
+    knutsfordSelect.removeAttribute("required");
   }
     }
     
