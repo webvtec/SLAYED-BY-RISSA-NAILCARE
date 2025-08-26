@@ -938,6 +938,7 @@
   <button type="button" class="option-button" onclick="selectOption('bearers')">Bearers</button>
 </div>
 
+<!-- Knutsford dropdown -->
 <div id="knutsfordDropdown" style="display:none; margin-top:15px;">
   <label for="knutsfordLocation">Select Knutsford Location:</label>
   <select id="knutsfordLocation" name="knutsfordLocation">
@@ -2593,22 +2594,38 @@ function closeCheckout() {
     }
     return;
   }
-  
+
+  const customerName = document.getElementById('checkoutName').value.trim();
+  const customerPhone = document.getElementById('checkoutPhone').value.trim();
+  const deliveryAddress = document.getElementById('checkoutAddress').value.trim();
+
+  // ✅ Validate required fields BEFORE saving or sending
+  if (!customerName || !customerPhone || !deliveryAddress) {
+    alert("Please fill in all required fields: Name, Phone, and Delivery Address.");
+    return;
+  }
+
+  if (!cart || cart.length === 0) {
+    alert("Your cart is empty. Please add items before placing an order.");
+    return;
+  }
+
   const orderNumber = 'ORD-' + Date.now().toString().slice(-6);
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
+
   const orderData = {
     uid: user.uid,
-    customerName: document.getElementById('checkoutName').value.trim(),
-    customerPhone: document.getElementById('checkoutPhone').value.trim(),
-    deliveryAddress: document.getElementById('checkoutAddress').value.trim(),
+    customerName,
+    customerPhone,
+    deliveryAddress,
     items: cart,
     total: total,
     status: 'pending',
     orderDate: firebase.firestore.FieldValue.serverTimestamp(),
     orderNumber: orderNumber
   };
-  
+
+  // ✅ Only reach this point if all required fields are filled
   db.collection('orders').add(orderData)
     .then(() => {
       // Send Telegram notification
@@ -2639,13 +2656,13 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     })
     .then(() => {
       // Show detailed success modal
-      showOrderConfirmation(orderNumber, orderData.customerName, total);
-      
+      showOrderConfirmation(orderNumber, customerName, total, cart);
+
       // Clear cart and close modals
       cart = [];
       updateCartDisplay();
       closeCheckout();
-      
+
       // Reset form
       document.querySelector('#checkoutModal form').reset();
     })
@@ -2653,7 +2670,8 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
       console.error('Error placing order:', error);
       alert('Failed to place order. Please try again.');
     });
-    }
+}
+
 
 
     function showOrderConfirmation(orderNumber, customerName, total, cart) {
@@ -2763,21 +2781,27 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
 
 
     function selectOption(option) {
-  document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('active'));
+  const knutsfordDiv = document.getElementById("knutsfordDropdown");
+  const deliveryDiv = document.getElementById("deliveryAddressBlock");
+  const knutsfordSelect = document.getElementById("knutsfordLocation");
+  const addressInput = document.getElementById("checkoutAddress");
 
-  if (option === 'knutsford') {
-    document.getElementById('knutsfordDropdown').style.display = 'block';
-    document.getElementById('deliveryAddressBlock').style.display = 'none'; // hide textarea
-    document.querySelector('.option-button:nth-child(1)').classList.add('active');
-    document.getElementById('checkoutAddress').required = false; // not required for knutsford
-  } else if (option === 'bearers') {
-    document.getElementById('knutsfordDropdown').style.display = 'none';
-    document.getElementById('deliveryAddressBlock').style.display = 'block'; // show textarea
-    document.querySelector('.option-button:nth-child(2)').classList.add('active');
-    document.getElementById('checkoutAddress').required = true; // required for bearers
+  if (option === "knutsford") {
+    knutsfordDiv.style.display = "block";
+    deliveryDiv.style.display = "none";
+
+    knutsfordSelect.setAttribute("required", "true");
+    addressInput.removeAttribute("required");
+    addressInput.value = ""; // clear hidden input
+  } else if (option === "bearers") {
+    knutsfordDiv.style.display = "none";
+    deliveryDiv.style.display = "block";
+
+    addressInput.setAttribute("required", "true");
+    knutsfordSelect.removeAttribute("required");
+    knutsfordSelect.value = ""; // clear hidden select
   }
 }
-
 
     
   </script>
