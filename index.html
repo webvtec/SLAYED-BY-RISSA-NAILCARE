@@ -472,11 +472,6 @@
 <a class="location-button" href="https://maps.app.goo.gl/Y5KEuKuHc6AVJY1BA" target="_blank">📍</a>
 </div>
 
-    <!-- Cart button (directly below location button, flush to edge) -->
-  <button class="cart-button" onclick="toggleCart()">🛒
-    <span id="cartCount">0</span>
-  </button>
-</div>
     
 <!-- Gallery Section (Now Wrapped) -->
 <div class="content-section active" id="gallerySection">
@@ -740,10 +735,15 @@
     <!-- Add this to your main index.html file after the reviewsSection div -->
 
 <!-- Replace your products section with this corrected version -->
-<div class="content-section" id="productsSection">
+<div class="content-section" id="productsSection" style="position: relative;">
+  <button class="cart-button" onclick="toggleCart()">🛒
+    <span id="cartCount">0</span>
+  </button>
+
   <div style="text-align: center; margin: 48px 0px 20px 0;">
     <h1 style="color: #FE5DC7; margin: 0;">PRODUCTS</h1>
   </div>
+
 
   
     
