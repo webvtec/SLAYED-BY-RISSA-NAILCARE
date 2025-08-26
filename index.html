@@ -2758,27 +2758,16 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     function selectOption(option) {
   document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('active'));
 
-  const knutsfordDropdown = document.getElementById('knutsfordDropdown');
-  const knutsfordSelect   = document.getElementById('knutsfordLocation');
-  const deliveryBlock     = document.getElementById('deliveryAddressBlock');
-  const deliveryTextarea  = document.getElementById('checkoutAddress');
-
   if (option === 'knutsford') {
-    knutsfordDropdown.style.display = 'block';
-    deliveryBlock.style.display = 'none';
-
-    knutsfordSelect.required = true;
-    deliveryTextarea.required = false;
-
+    document.getElementById('knutsfordDropdown').style.display = 'block';
+    document.getElementById('deliveryAddressBlock').style.display = 'none'; // hide textarea
     document.querySelector('.option-button:nth-child(1)').classList.add('active');
+    document.getElementById('checkoutAddress').required = false; // not required for knutsford
   } else if (option === 'bearers') {
-    knutsfordDropdown.style.display = 'none';
-    deliveryBlock.style.display = 'block';
-
-    knutsfordSelect.required = false;
-    deliveryTextarea.required = true;
-
+    document.getElementById('knutsfordDropdown').style.display = 'none';
+    document.getElementById('deliveryAddressBlock').style.display = 'block'; // show textarea
     document.querySelector('.option-button:nth-child(2)').classList.add('active');
+    document.getElementById('checkoutAddress').required = true; // required for bearers
   }
 }
 
