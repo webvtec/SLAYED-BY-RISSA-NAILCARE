@@ -508,10 +508,7 @@
 <div id="galleryDisplay"></div>
 </div>
 
-<!-- Add this button in your gallery section -->
-<button onclick="migrateExistingPhotos()" style="background-color: #ff9800; color: white; margin-bottom: 15px;">
-  Update Existing Photos with Site ID
-</button>
+
     
 <!-- Menu -->
 <div class="menu" id="menu">
@@ -2812,44 +2809,6 @@ ${orderSummary}
     knutsfordSelect.value = ""; // clear hidden select
   }
 }
-
-
-    function migrateExistingPhotos() {
-  if (!confirm("This will update all photos without siteId to use the currently selected site (" + document.getElementById('siteSelect').value + "). Continue?")) {
-    return;
-  }
-
-  const selectedSite = document.getElementById('siteSelect').value;
-  
-  db.collection('gallery')
-    .get()
-    .then(snapshot => {
-      const batch = db.batch();
-      let updateCount = 0;
-      
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        // Only update photos that don't have siteId
-        if (!data.siteId) {
-          batch.update(doc.ref, { siteId: selectedSite });
-          updateCount++;
-        }
-      });
-
-      if (updateCount === 0) {
-        alert("All photos already have siteId assigned");
-        return;
-      }
-
-      return batch.commit().then(() => {
-        alert(`Updated ${updateCount} photos with siteId: ${selectedSite}`);
-      });
-    })
-    .catch(error => {
-      console.error("Error migrating photos:", error);
-      alert("Error updating photos: " + error.message);
-    });
-    }
 
     
   </script>
