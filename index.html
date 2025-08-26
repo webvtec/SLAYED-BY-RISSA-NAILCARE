@@ -2609,7 +2609,7 @@ async function generateUniqueOrderNumber() {
 // Update your submitOrder function (make it async)
 async function submitOrder(event) {
   event.preventDefault();
-  
+
   const user = firebase.auth().currentUser;
   if (!user) {
     if (confirm("You must be logged in to place an order. Click OK to log in.")) {
@@ -2623,25 +2623,22 @@ async function submitOrder(event) {
   const deliveryAddress = document.getElementById('checkoutAddress')?.value.trim() || "";
   const knutsfordLocation = document.getElementById('knutsfordLocation')?.value || "";
 
-  // Check base fields
+  // Validation
   if (!customerName || !customerPhone) {
     alert("Please fill in your Name and Phone.");
     return;
   }
-
-  // Require EITHER Knutsford OR Address
   if (!knutsfordLocation && !deliveryAddress) {
     alert("Please select a Knutsford location OR enter a delivery address.");
     return;
   }
-
   if (!cart || cart.length === 0) {
     alert("Your cart is empty. Please add items before placing an order.");
     return;
   }
 
-  // Generate unique order number
-  const orderNumber = await generateUniqueOrderNumber();
+  // Generate order number (pass customerName so prefix works)
+  const orderNumber = await generateUniqueOrderNumber(customerName);
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const orderData = {
@@ -2649,28 +2646,35 @@ async function submitOrder(event) {
     customerName,
     customerPhone,
     deliveryAddress,
+    knutsfordLocation,
     items: cart,
-    total: total,
+    total,
     status: 'pending',
     orderDate: firebase.firestore.FieldValue.serverTimestamp(),
     orderNumber: orderNumber
   };
 
-  // Save to database
+  // Save to Firestore
   db.collection('orders').add(orderData)
     .then(() => {
-      // Send Telegram notification
+      // Build Telegram message
+      const orderSummary = cart.map(item =>
+        `• ${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`
+      ).join('\n');
+
       const telegramMessage = `🛒 NEW PRODUCT ORDER
 
 📋 Order #: ${orderNumber}
-👤 Customer: ${orderData.customerName}
-📞 Phone: ${orderData.customerPhone}
-📍 Address: ${orderData.deliveryAddress}
+👤 Customer: ${customerName}
+📞 Phone: ${customerPhone}
+📍 Address: ${deliveryAddress || knutsfordLocation}
 
 🛍️ Items:
-${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+${orderSummary}
 
 💰 Total: $${total.toFixed(2)}`;
+
+      console.log("Telegram message:", telegramMessage); // debug
 
       const telegramBotToken = "7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8";
       const telegramChatId = "-1002734216867";
@@ -2686,15 +2690,13 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
       });
     })
     .then(() => {
-      // Show detailed success modal
+      // Show confirmation popup
       showOrderConfirmation(orderNumber, customerName, total, cart);
 
-      // Clear cart and close modals
+      // Reset cart and form
       cart = [];
       updateCartDisplay();
       closeCheckout();
-
-      // Reset form
       document.querySelector('#checkoutModal form').reset();
     })
     .catch(error => {
@@ -2702,6 +2704,7 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
       alert('Failed to place order. Please try again.');
     });
 }
+
 
     function showOrderConfirmation(orderNumber, customerName, total, cart) {
   Swal.fire({
