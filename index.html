@@ -2707,39 +2707,24 @@ ${orderSummary}
 
 
     function showOrderConfirmation(orderNumber, customerName, total, cart) {
-  // Build a neat order summary from cart
-  const orderSummary = cart.map(item =>
-    `${item.name.toUpperCase()} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`
-  ).join('<br>');
-
   Swal.fire({
     title: "",
     html: `
       <div style="text-align:center; font-size:15px; line-height:1.7; color:#222; padding:20px; font-family:Arial, sans-serif;">
         
         <!-- Order Number -->
-        <h2 style="color:#000; margin:0 0 12px 0; font-size:24px; font-weight:bold; letter-spacing:1px;">
+        <h2 style="color:#000; margin:0 0 8px 0; font-size:24px; font-weight:bold; letter-spacing:1px;">
           ORDER #: ${orderNumber}
         </h2>
-
-        <!-- Customer Name -->
-        <p style="margin:0 0 15px 0; font-size:15px; color:#444;">
-          Thank you <strong>${customerName}</strong>, your order has been placed.
-        </p>
-
-        <!-- Order Summary -->
-        <div style="text-align:left; margin:15px 0; font-size:15px; color:#000;">
-          <h3 style="margin:0 0 8px 0; font-size:16px; font-weight:bold;">Order Summary:</h3>
-          ${orderSummary}
-        </div>
-
-        <hr style="margin:18px 0; border:0; height:1px; background:#ddd;">
+        
 
         <!-- Payment Instructions -->
         <p style="margin:0 0 12px 0; font-size:15px;">
-          The total must be transferred within <strong>48 hours</strong> or your order will be cancelled.<br>
+          Your order was made, the total must be transferred within <strong>48 hours</strong> or your order will be cancelled.<br>
           Please use your <strong>Order Number</strong> as the banking reference.
         </p>
+
+        <hr style="margin:18px 0; border:0; height:1px; background:#ddd;">
 
         <p style="margin:0 0 20px 0; font-size:15px;">
           Once payment is received, your order will be shipped and you’ll receive a confirmation message with all necessary details.
@@ -2773,7 +2758,7 @@ ${orderSummary}
 
       </div>
     `,
-    width: 480,
+    width: 460,
     confirmButtonText: "OK",
     confirmButtonColor: "#61134A",
     showConfirmButton: true,
@@ -2782,8 +2767,7 @@ ${orderSummary}
       popup: "swal2-rounded"
     }
   });
-}
-
+    }
 
 
     function showUserOrders() {
