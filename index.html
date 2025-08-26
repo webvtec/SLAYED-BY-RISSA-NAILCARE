@@ -472,6 +472,11 @@
 <a class="location-button" href="https://maps.app.goo.gl/Y5KEuKuHc6AVJY1BA" target="_blank">📍</a>
 </div>
 
+    <!-- Cart button (directly below location button, flush to edge) -->
+  <button class="cart-button" onclick="toggleCart()">🛒
+    <span id="cartCount">0</span>
+  </button>
+</div>
     
 <!-- Gallery Section (Now Wrapped) -->
 <div class="content-section active" id="gallerySection">
@@ -736,42 +741,11 @@
 
 <!-- Replace your products section with this corrected version -->
 <div class="content-section" id="productsSection">
-  <div style="display: flex; text-align: center; justify-content: space-between; align-items: center; margin: 48px 0px 20px 20px;">
-  <h1 style="color: #FE5DC7; margin: 0;">PRODUCTS</h1>
-
-  
-  <button onclick="toggleCart()" style="
-    position: relative;
-    cursor: pointer;
-    background: #EF92AB;
-    border: none;
-    border-radius: 0px;
-    height: 48px;
-    width: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  ">🛒
-    <span id="cartCount" style="
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: red;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-    ">0</span>
-  </button>
+  <div style="text-align: center; margin: 48px 0px 20px 0;">
+    <h1 style="color: #FE5DC7; margin: 0;">PRODUCTS</h1>
   </div>
 
+  
     
   <!-- Products Grid (container for grouped sections) -->
   <div id="productsGrid" style="
