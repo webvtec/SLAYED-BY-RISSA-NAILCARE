@@ -2595,15 +2595,23 @@ function closeCheckout() {
     return;
   }
 
-  const customerName = document.getElementById('name').value.trim();
-const customerPhone = document.getElementById('phone').value.trim();
-const deliveryAddress = document.getElementById('checkoutAddress').value.trim();
+  const customerName = document.getElementById('checkoutName').value.trim();
+const customerPhone = document.getElementById('checkoutPhone').value.trim();
+const deliveryAddress = document.getElementById('checkoutAddress')?.value.trim() || "";
+const knutsfordLocation = document.getElementById('knutsfordLocation')?.value || "";
 
-  // ✅ Validate required fields BEFORE saving or sending
-  if (!customerName || !customerPhone || !deliveryAddress) {
-    alert("Please fill in all required fields: Name, Phone, and Delivery Address.");
-    return;
-  }
+// ✅ Check base fields
+if (!customerName || !customerPhone) {
+  alert("Please fill in your Name and Phone.");
+  return;
+}
+
+// ✅ Require EITHER Knutsford OR Address
+if (!knutsfordLocation && !deliveryAddress) {
+  alert("Please select a Knutsford location OR enter a delivery address.");
+  return;
+}
+
 
   if (!cart || cart.length === 0) {
     alert("Your cart is empty. Please add items before placing an order.");
