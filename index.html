@@ -1251,52 +1251,53 @@ function selectPeriod(period) {
   const galleryContainer = document.getElementById(containerId);
   galleryContainer.innerHTML = '';
 
-  db.collection('gallery').onSnapshot((querySnapshot) => {
-    galleryContainer.innerHTML = '';
+  // 🔹 Change "siteA" to "siteB" on your other website
+  db.collection('gallery')
+    .where("siteId", "==", "siteA")
+    .onSnapshot((querySnapshot) => {
+      galleryContainer.innerHTML = '';
+      const categories = {};
 
-    const categories = {};
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const imageUrl = data.url;
+        const category = data.category || 'Uncategorized';
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const imageUrl = data.url;
-      const category = data.category || 'Uncategorized';
+        if (!categories[category]) {
+          categories[category] = [];
+        }
+        categories[category].push(imageUrl);
+      });
 
-      if (!categories[category]) {
-        categories[category] = [];
-      }
-      categories[category].push(imageUrl);
-    });
-
-    for (const category in categories) {
-      galleryContainer.innerHTML += `
-        <div class="gallery-category">
-          <h3>${category}</h3>
-          <div class="gallery-wrapper">
-            <div class="gallery-grid" id="gallery-${category}"></div>
-          </div>
-          <div style="text-align:center; margin-top:7px;">
-            <button 
-              onclick="showSection('bookingSection')" 
-              style="background-color:#61134A; color:#000; font-weight: bold; padding:10px 20px; border:none; border-radius:15px; cursor:pointer;">
-              BOOK A SERVICE NOW
-            </button>
-          </div>
-        </div>
-      `;
-
-      const categoryContainer = document.getElementById(`gallery-${category}`);
-      categories[category].forEach((imageUrl) => {
-        categoryContainer.innerHTML += `
-          <div>
-            <img src="${imageUrl}" alt="Design" style="margin-bottom:10px;">
+      for (const category in categories) {
+        galleryContainer.innerHTML += `
+          <div class="gallery-category">
+            <h3>${category}</h3>
+            <div class="gallery-wrapper">
+              <div class="gallery-grid" id="gallery-${category}"></div>
+            </div>
+            <div style="text-align:center; margin-top:7px;">
+              <button 
+                onclick="showSection('bookingSection')" 
+                style="background-color:#61134A; color:#000; font-weight: bold; padding:10px 20px; border:none; border-radius:15px; cursor:pointer;">
+                BOOK A SERVICE NOW
+              </button>
+            </div>
           </div>
         `;
-      });
-    }
-  });
+
+        const categoryContainer = document.getElementById(`gallery-${category}`);
+        categories[category].forEach((imageUrl) => {
+          categoryContainer.innerHTML += `
+            <div>
+              <img src="${imageUrl}" alt="Design" style="margin-bottom:10px;">
+            </div>
+          `;
+        });
+      }
+    });
 }
 
-// ✅ Force the Designs page to load immediately
 document.addEventListener('DOMContentLoaded', function () {
   showSection('gallerySection');
   loadGallery('galleryDisplay');
