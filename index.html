@@ -2771,45 +2771,6 @@ ${orderSummary}
     }
 
 
-    function showUserOrders() {
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-  
-  db.collection('orders')
-    .where('uid', '==', user.uid)
-    .orderBy('orderDate', 'desc')
-    .limit(5)
-    .get()
-    .then(snapshot => {
-      let ordersHTML = '';
-      
-      if (snapshot.empty) {
-        ordersHTML = '<p style="text-align:center; color:#666;">No orders found.</p>';
-      } else {
-        snapshot.forEach(doc => {
-          const order = doc.data();
-          const date = order.orderDate ? order.orderDate.toDate().toLocaleDateString() : 'Unknown date';
-          ordersHTML += `
-            <div style="border:1px solid #ddd; padding:15px; margin:10px 0; border-radius:8px;">
-              <h4 style="margin:0 0 10px 0; color:#61134A;">Order # ${order.orderNumber}</h4>
-              <p style="margin:5px 0;"><strong>Date:</strong> ${date}</p>
-              <p style="margin:5px 0;"><strong>Status:</strong> ${order.status}</p>
-              <p style="margin:5px 0;"><strong>Total:</strong> $${order.total.toFixed(2)}</p>
-            </div>
-          `;
-        });
-      }
-      
-      Swal.fire({
-        title: "Your Recent Orders",
-        html: `<div style="max-height:400px; overflow-y:auto;">${ordersHTML}</div>`,
-        width: 500,
-        confirmButtonText: "Close",
-        confirmButtonColor: "#61134A"
-      });
-    });
-    }
-
 
     function selectOption(option) {
   const knutsfordDiv = document.getElementById("knutsfordDropdown");
