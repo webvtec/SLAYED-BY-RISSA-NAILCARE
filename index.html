@@ -2584,7 +2584,30 @@ function closeCheckout() {
 }
 
 
-    function submitOrder(event) {
+    // Add this function to your script section
+async function generateUniqueOrderNumber() {
+  let orderNumber;
+  let isUnique = false;
+  
+  while (!isUnique) {
+    // Generate 6-digit number (100000 to 999999)
+    orderNumber = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Check if it exists in database
+    const snapshot = await db.collection('orders')
+      .where('orderNumber', '==', orderNumber)
+      .get();
+    
+    if (snapshot.empty) {
+      isUnique = true;
+    }
+  }
+  
+  return orderNumber;
+}
+
+// Update your submitOrder function (make it async)
+async function submitOrder(event) {
   event.preventDefault();
   
   const user = firebase.auth().currentUser;
@@ -2596,29 +2619,29 @@ function closeCheckout() {
   }
 
   const customerName = document.getElementById('checkoutName').value.trim();
-const customerPhone = document.getElementById('checkoutPhone').value.trim();
-const deliveryAddress = document.getElementById('checkoutAddress')?.value.trim() || "";
-const knutsfordLocation = document.getElementById('knutsfordLocation')?.value || "";
+  const customerPhone = document.getElementById('checkoutPhone').value.trim();
+  const deliveryAddress = document.getElementById('checkoutAddress')?.value.trim() || "";
+  const knutsfordLocation = document.getElementById('knutsfordLocation')?.value || "";
 
-// ✅ Check base fields
-if (!customerName || !customerPhone) {
-  alert("Please fill in your Name and Phone.");
-  return;
-}
+  // Check base fields
+  if (!customerName || !customerPhone) {
+    alert("Please fill in your Name and Phone.");
+    return;
+  }
 
-// ✅ Require EITHER Knutsford OR Address
-if (!knutsfordLocation && !deliveryAddress) {
-  alert("Please select a Knutsford location OR enter a delivery address.");
-  return;
-}
-
+  // Require EITHER Knutsford OR Address
+  if (!knutsfordLocation && !deliveryAddress) {
+    alert("Please select a Knutsford location OR enter a delivery address.");
+    return;
+  }
 
   if (!cart || cart.length === 0) {
     alert("Your cart is empty. Please add items before placing an order.");
     return;
   }
 
-  const orderNumber = 'ORD-' + Date.now().toString().slice(-6);
+  // Generate unique order number
+  const orderNumber = await generateUniqueOrderNumber();
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const orderData = {
@@ -2633,7 +2656,7 @@ if (!knutsfordLocation && !deliveryAddress) {
     orderNumber: orderNumber
   };
 
-  // ✅ Only reach this point if all required fields are filled
+  // Save to database
   db.collection('orders').add(orderData)
     .then(() => {
       // Send Telegram notification
@@ -2680,55 +2703,45 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     });
 }
 
-
-
     function showOrderConfirmation(orderNumber, customerName, total, cart) {
   Swal.fire({
-    title: "ORDER CONFIRMED",
+    title: "",
     html: `
-      <div style="text-align:center; font-size:16px; line-height:1.6; color:#333; padding:20px;">
-        <h2 style="color:#61134A; margin:0 0 15px 0; font-size:24px; font-weight:bold;">
-          ORDER #${orderNumber}
+      <div style="text-align:center; font-size:16px; line-height:1.8; color:#000; padding:20px; font-family:Arial, sans-serif;">
+        <h2 style="color:#000; margin:0 0 20px 0; font-size:22px; font-weight:bold;">
+          ORDER #CA${orderNumber}
         </h2>
         
-        <div style="background:#fff3cd; padding:20px; border-radius:8px; border-left:4px solid #ffc107; margin:20px 0; text-align:left;">
-          <p style="margin:0 0 15px 0; font-size:16px; font-weight:bold; color:#856404;">
-            THE TOTAL must be transferred within 48 hours or your order will be cancelled.
-          </p>
-          <p style="margin:0; font-size:18px; color:#6c2eb9; font-weight:bold;">
-            Deposit Due: JMD $${total.toFixed(2)}
-          </p>
+        <p style="margin:0 0 15px 0; font-size:16px; font-weight:normal; color:#000;">
+          THE TOTAL must be transferred within 48 hours or your order will be cancelled.
+        </p>
+        
+        <p style="margin:0 0 25px 0; font-size:18px; color:#6c2eb9; font-weight:bold;">
+          Payment Due: JMD ${total.toFixed(2)}
+        </p>
+        
+        <div style="text-align:left; margin:20px 0;">
+          <h3 style="color:#000; margin:0 0 15px 0; font-size:18px; font-weight:bold;">Banking Details:</h3>
+          <p style="margin:5px 0; color:#000;"><strong>Bank:</strong> First Caribbean Bank</p>
+          <p style="margin:5px 0; color:#000;"><strong>Account:</strong> John Doe</p>
+          <p style="margin:5px 0; color:#000;"><strong>Number:</strong> 123456789</p>
+          <p style="margin:5px 0; color:#000;"><strong>Branch:</strong> Kingston, Jamaica</p>
         </div>
         
-        <div style="background:#f8f9fa; padding:20px; border-radius:8px; margin:20px 0; text-align:left;">
-          <h3 style="color:#61134A; margin:0 0 15px 0; font-size:18px;">Banking Details:</h3>
-          <div style="font-size:16px; line-height:1.8;">
-            <p style="margin:5px 0;"><strong>Bank:</strong> First Caribbean Bank</p>
-            <p style="margin:5px 0;"><strong>Account:</strong> John Doe</p>
-            <p style="margin:5px 0;"><strong>Number:</strong> 123456789</p>
-            <p style="margin:5px 0;"><strong>Branch:</strong> Kingston, Jamaica</p>
-          </div>
-        </div>
-        
-        <div style="background:#e8f5e8; padding:15px; border-radius:8px; border-left:4px solid #4CAF50; text-align:left;">
-          <p style="margin:0; font-size:14px; color:#2e7d32;">
-            <strong>Note:</strong> Please use your Order #${orderNumber} as the payment reference when making the transfer.
+        <div style="margin-top:25px; text-align:center;">
+          <p style="margin:0; font-size:14px; color:#666;">
+            ℹ️ If you need to see the banking info again it is always visible in the <strong>PAYMENT INFO</strong> section of the menu
           </p>
         </div>
       </div>
     `,
-    width: 500,
+    width: 450,
     confirmButtonText: "OK",
     confirmButtonColor: "#61134A",
-    showCancelButton: true,
-    cancelButtonText: "View My Orders",
-    cancelButtonColor: "#E58BBE",
+    showConfirmButton: true,
+    showCancelButton: false,
     customClass: {
       popup: "swal2-rounded"
-    }
-  }).then((result) => {
-    if (result.dismiss === Swal.DismissReason.cancel) {
-      showUserOrders();
     }
   });
     }
