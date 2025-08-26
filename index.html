@@ -2684,52 +2684,41 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
 
     function showOrderConfirmation(orderNumber, customerName, total, cart) {
   Swal.fire({
-    title: "Order Confirmed!",
+    title: "ORDER CONFIRMED",
     html: `
-      <div style="text-align:left; font-size:16px; line-height:1.6; color:#333;">
-        <div style="text-align:center; margin-bottom:20px;">
-          <h3 style="color:#61134A; margin:0;">Thank you, ${customerName}!</h3>
-          <p style="color:#E58BBE; font-size:18px; font-weight:bold; margin:5px 0;">
-            Order #: ${orderNumber}
+      <div style="text-align:center; font-size:16px; line-height:1.6; color:#333; padding:20px;">
+        <h2 style="color:#61134A; margin:0 0 15px 0; font-size:24px; font-weight:bold;">
+          ORDER #${orderNumber}
+        </h2>
+        
+        <div style="background:#fff3cd; padding:20px; border-radius:8px; border-left:4px solid #ffc107; margin:20px 0; text-align:left;">
+          <p style="margin:0 0 15px 0; font-size:16px; font-weight:bold; color:#856404;">
+            THE TOTAL must be transferred within 48 hours or your order will be cancelled.
+          </p>
+          <p style="margin:0; font-size:18px; color:#6c2eb9; font-weight:bold;">
+            Deposit Due: JMD $${total.toFixed(2)}
           </p>
         </div>
         
-        <hr style="margin:15px 0; border:none; height:1px; background:#ddd;">
-        
-        <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0;">
-          <h4 style="color:#61134A; margin:0 0 10px 0;">Order Summary:</h4>
-          ${cart.map(item => `
-            <div style="display:flex; justify-content:space-between; margin:5px 0;">
-              <span>${item.name} (x${item.quantity})</span>
-              <span>$${(item.price * item.quantity).toFixed(2)}</span>
-            </div>
-          `).join('')}
-          <hr style="margin:10px 0; border:none; height:1px; background:#ddd;">
-          <div style="display:flex; justify-content:space-between; font-weight:bold; color:#E58BBE;">
-            <span>Total:</span>
-            <span>$${total.toFixed(2)}</span>
+        <div style="background:#f8f9fa; padding:20px; border-radius:8px; margin:20px 0; text-align:left;">
+          <h3 style="color:#61134A; margin:0 0 15px 0; font-size:18px;">Banking Details:</h3>
+          <div style="font-size:16px; line-height:1.8;">
+            <p style="margin:5px 0;"><strong>Bank:</strong> First Caribbean Bank</p>
+            <p style="margin:5px 0;"><strong>Account:</strong> John Doe</p>
+            <p style="margin:5px 0;"><strong>Number:</strong> 123456789</p>
+            <p style="margin:5px 0;"><strong>Branch:</strong> Kingston, Jamaica</p>
           </div>
         </div>
         
-        <div style="background:#e8f5e8; padding:15px; border-radius:8px; border-left:4px solid #4CAF50;">
-          <h4 style="color:#2e7d32; margin:0 0 10px 0;">What happens next?</h4>
-          <p style="margin:5px 0; font-size:14px;">✓ We will contact you within 24 hours</p>
-          <p style="margin:5px 0; font-size:14px;">✓ Payment arrangements will be discussed</p>
-          <p style="margin:5px 0; font-size:14px;">✓ Delivery details will be confirmed</p>
-          <p style="margin:5px 0; font-size:14px;">✓ Order processing typically takes 1-3 business days</p>
-        </div>
-        
-        <div style="background:#fff3cd; padding:15px; border-radius:8px; border-left:4px solid:#ffc107; margin-top:15px;">
-          <h4 style="color:#856404; margin:0 0 5px 0;">Important Notes:</h4>
-          <p style="margin:0; font-size:14px; color:#856404;">
-            Please keep your order number for reference. 
-            You can also find this information in your account under "My Orders".
+        <div style="background:#e8f5e8; padding:15px; border-radius:8px; border-left:4px solid #4CAF50; text-align:left;">
+          <p style="margin:0; font-size:14px; color:#2e7d32;">
+            <strong>Note:</strong> Please use your Order #${orderNumber} as the payment reference when making the transfer.
           </p>
         </div>
       </div>
     `,
-    width: 600,
-    confirmButtonText: "Continue Shopping",
+    width: 500,
+    confirmButtonText: "OK",
     confirmButtonColor: "#61134A",
     showCancelButton: true,
     cancelButtonText: "View My Orders",
@@ -2739,12 +2728,10 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
     }
   }).then((result) => {
     if (result.dismiss === Swal.DismissReason.cancel) {
-      // If user clicks "View My Orders"
-      showUserOrders(); // make sure this function exists
+      showUserOrders();
     }
   });
-}
-
+    }
     
 
 
