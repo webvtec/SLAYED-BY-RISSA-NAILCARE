@@ -2762,15 +2762,14 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
 
   if (option === 'knutsford') {
     document.getElementById('knutsfordDropdown').style.display = 'block';
-    document.getElementById('bearersInput').style.display = 'none';
+    document.getElementById('deliveryAddressWrapper').style.display = 'none';
     document.querySelector('.option-button:nth-child(1)').classList.add('active');
   } else if (option === 'bearers') {
     document.getElementById('knutsfordDropdown').style.display = 'none';
-    document.getElementById('bearersInput').style.display = 'block';
+    document.getElementById('deliveryAddressWrapper').style.display = 'block';
     document.querySelector('.option-button:nth-child(2)').classList.add('active');
   }
 }
-
 
     
   </script>
