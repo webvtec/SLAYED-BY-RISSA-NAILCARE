@@ -664,6 +664,54 @@ box-sizing: border-box;
     }
 
 
+    function loadGallery() {
+  const galleryContainer = document.getElementById('adminGallery');
+  const selectedSite = document.getElementById('siteSelect').value;
+  galleryContainer.innerHTML = '';
+
+  db.collection('gallery')
+    .where("siteId", "==", selectedSite)
+    .onSnapshot((querySnapshot) => {
+      galleryContainer.innerHTML = '';
+
+      const categories = {};
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const imageUrl = data.url;
+        const category = data.category || 'Uncategorized';
+
+        if (!categories[category]) {
+          categories[category] = [];
+        }
+        categories[category].push({ imageUrl: imageUrl, docId: doc.id });
+      });
+
+      for (const category in categories) {
+        galleryContainer.innerHTML += `
+          <div class="gallery-category">
+            <h3>${category}</h3>
+            <div class="gallery-wrapper">
+              <div class="gallery-grid" id="gallery-${category}"></div>
+            </div>
+          </div>
+        `;
+
+        const categoryContainer = document.getElementById(`gallery-${category}`);
+
+        categories[category].forEach(item => {
+          categoryContainer.innerHTML += `
+            <div>
+              <img src="${item.imageUrl}" alt="Design">
+              <button class="remove-btn" onclick="removePhoto('${item.docId}')">X</button>
+            </div>
+          `;
+        });
+      }
+    });
+    }
+
+
     function loadReservations() {
   const reservationsContainer = document.getElementById('reservationsList');
   db.collection('bookings').orderBy("date", "asc").onSnapshot(snapshot => {
@@ -1155,14 +1203,6 @@ firebase.auth().onAuthStateChanged(user => {
 
     let currentBookingId = null;
 
-function updateDeposit(bookingId) {
-  currentBookingId = bookingId;
-
-  // ✅ Reset radio buttons
-  document.querySelectorAll('input[name="depositChoice"]').forEach(r => r.checked = false);
-
-  document.getElementById('depositModal').style.display = 'flex';
-}
 
 function confirmDeposit() {
   const choice = document.querySelector('input[name="depositChoice"]:checked');
