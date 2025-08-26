@@ -2705,56 +2705,63 @@ ${cart.map(item => `• ${item.name} (x${item.quantity}) - $${(item.price * item
 
     function showOrderConfirmation(orderNumber, customerName, total, cart) {
   Swal.fire({
-    title: "",
-    html: `
-      <div style="text-align:center; font-size:16px; line-height:1.8; color:#000; padding:20px; font-family:Arial, sans-serif;">
-        <h2 style="color:#000; margin:0 0 20px 0; font-size:22px; font-weight:bold;">
-          ORDER #${orderNumber}
-        </h2>
-        
-        <p style="margin:0 0 15px 0; font-size:16px; font-weight:normal; color:#000;">
-          <strong>THE TOTAL</strong> must be transferred within 48 hours or your order will be cancelled. Please use your order number as banking refrence.
-        </p>
+  title: "",
+  html: `
+    <div style="text-align:center; font-size:15px; line-height:1.7; color:#222; padding:20px; font-family:Arial, sans-serif;">
+      
+      <!-- Order Number -->
+      <h2 style="color:#000; margin:0 0 20px 0; font-size:24px; font-weight:bold; letter-spacing:1px;">
+        ORDER #${orderNumber}
+      </h2>
 
+      <!-- Payment Instructions -->
+      <p style="margin:0 0 12px 0; font-size:15px;">
+        <strong>The total</strong> must be transferred within <strong>48 hours</strong> or your order will be cancelled.<br>
+        Please use your <strong>Order Number</strong> as the banking reference.
+      </p>
 
-        <p style="margin:0 0 15px 0; font-size:16px; font-weight:normal; color:#000;">
-         Once payment is recievd your order will be shipped and you'll recieve a message with all the details.
-        </p>
+      <p style="margin:0 0 20px 0; font-size:15px;">
+        Once payment is received, your order will be shipped and you’ll receive a confirmation message with all details.
+      </p>
 
-    
-        <p style="margin:0 0 25px 0; font-size:18px; color:#6c2eb9; font-weight:bold;">
-          Payment Due: JMD ${total.toFixed(2)}
-        </p>
+      <!-- Total Due -->
+      <p style="margin:0 0 25px 0; font-size:18px; color:#6c2eb9; font-weight:bold;">
+        Payment Due: JMD ${total.toFixed(2)}
+      </p>
 
-    <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
-    
-        <div style="text-align:left; margin:20px 0;">
-          <h3 style="color:#000; margin:0 0 15px 0; font-size:18px; font-weight:bold;">Banking Details:</h3>
-          <p style="margin:5px 0; color:#000;"><strong>Bank:</strong> First Caribbean Bank</p>
-          <p style="margin:5px 0; color:#000;"><strong>Account:</strong> John Doe</p>
-          <p style="margin:5px 0; color:#000;"><strong>Number:</strong> 123456789</p>
-          <p style="margin:5px 0; color:#000;"><strong>Branch:</strong> Kingston, Jamaica</p>
-        </div>
+      <hr style="margin:18px 0; border:0; height:1px; background:#ddd;">
 
-        <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
-        
-        <div style="margin-top:25px; text-align:center;">
-          <p style="margin:0; font-size:14px; color:#666;">
-            ℹ️ If you need to see the banking info again it is always visible in the <strong>PAYMENT INFO</strong> section of the menu
-          </p>
-        </div>
+      <!-- Banking Details -->
+      <div style="text-align:left; margin:15px 0;">
+        <h3 style="color:#000; margin:0 0 12px 0; font-size:17px; font-weight:bold;">Banking Details</h3>
+        <p style="margin:4px 0; color:#000;"><strong>Bank:</strong> First Caribbean Bank</p>
+        <p style="margin:4px 0; color:#000;"><strong>Account Name:</strong> John Doe</p>
+        <p style="margin:4px 0; color:#000;"><strong>Account Number:</strong> 123456789</p>
+        <p style="margin:4px 0; color:#000;"><strong>Branch:</strong> Kingston, Jamaica</p>
       </div>
-    `,
-    width: 450,
-    confirmButtonText: "OK",
-    confirmButtonColor: "#61134A",
-    showConfirmButton: true,
-    showCancelButton: false,
-    customClass: {
-      popup: "swal2-rounded"
-    }
-  });
-    }
+
+      <hr style="margin:18px 0; border:0; height:1px; background:#ddd;">
+
+      <!-- Reminder -->
+      <div style="margin-top:20px; text-align:center;">
+        <p style="margin:0; font-size:13px; color:#666;">
+          ℹ️ You can always find these details again in the 
+          <strong>PAYMENT INFO</strong> section of the menu.
+        </p>
+      </div>
+
+    </div>
+  `,
+  width: 460,
+  confirmButtonText: "OK",
+  confirmButtonColor: "#61134A",
+  showConfirmButton: true,
+  showCancelButton: false,
+  customClass: {
+    popup: "swal2-rounded"
+  }
+});
+ }
     
 
 
