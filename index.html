@@ -2237,7 +2237,7 @@ function getSelectedServiceDuration() {
     });
 
     // Generate slots every 15 minutes
-    for (let t = openMinutes; t <= closeMinutes - duration; t += 15) {
+    for (let t = openMinutes; t <= closeMinutes - duration; t += 5) {
       const end = t + duration;
       let conflict = bookings.some(b => !(end <= b.start || t >= b.end)) ||
                     unavailableRanges.some(r => !(end <= r.start || t >= r.end));
