@@ -1376,99 +1376,62 @@ const businessHours = {
   'Saturday': { open: '8:00 AM', close: '8:00 PM' }
 };
 
+
+
 function showEstimateTime() {
-    const pedicureType = document.getElementById('pedicureType').value;
-    const manicureType = document.getElementById('manicureType').value;
-    const estimateMessage = document.getElementById('estimateTimeMessage');
+  const manicurePedicureType = document.getElementById('manicurePedicureType').value;
+  const polishArtType = document.getElementById('polishArtType').value;
+  const acrylicType = document.getElementById('acrylicType').value;
+  const gelType = document.getElementById('gelType').value;
+  const otherType = document.getElementById('otherType').value;
+  const estimateMessage = document.getElementById('estimateTimeMessage');
 
-    // Default message when no type is selected
-    if (pedicureType === 'NONE' && manicureType === 'NONE') {
-        estimateMessage.innerHTML = '';
-        return;
+  // Calculate total duration
+  let totalMinutes = 0;
+  let selectedServices = [];
+
+  if (manicurePedicureType !== 'NONE') {
+    totalMinutes += serviceDurations[manicurePedicureType] || 60;
+    selectedServices.push(manicurePedicureType);
+  }
+  if (polishArtType !== 'NONE') {
+    totalMinutes += serviceDurations[polishArtType] || 30;
+    selectedServices.push(polishArtType);
+  }
+  if (acrylicType !== 'NONE') {
+    totalMinutes += serviceDurations[acrylicType] || 60;
+    selectedServices.push(acrylicType);
+  }
+  if (gelType !== 'NONE') {
+    totalMinutes += serviceDurations[gelType] || 60;
+    selectedServices.push(gelType);
+  }
+  if (otherType !== 'NONE') {
+    totalMinutes += serviceDurations[otherType] || 30;
+    selectedServices.push(otherType);
+  }
+
+  if (selectedServices.length === 0) {
+    estimateMessage.innerHTML = '';
+    return;
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  let timeDisplay = '';
+  
+  if (hours > 0) {
+    timeDisplay += `${hours} hour${hours > 1 ? 's' : ''}`;
+    if (minutes > 0) {
+      timeDisplay += ` ${minutes} minutes`;
     }
+  } else {
+    timeDisplay = `${minutes} minutes`;
+  }
 
-    let timeEstimate = '';
-
-    // Set estimated time based on pedicure type
-    if (pedicureType !== 'NONE') {
-        switch (pedicureType) {
-            case 'Regular Pedicure':
-                timeEstimate = 'Approximately 1 hour';
-                break;
-            case 'Spa Pedicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'Deluxe Pedicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'Gel Pedicure':
-                timeEstimate = 'Approximately 2 hours';
-                break;
-            case 'Paraffin Pedicure':
-                timeEstimate = 'Approximately 1 hour';
-                break;
-            case 'Hot Stone Pedicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'French Pedicure':
-                timeEstimate = 'Approximately 1 hour';
-                break;
-            case 'Shellac Pedicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'Fish Pedicure':
-                timeEstimate = 'Approximately 1 hour';
-                break;
-            case 'Athletic Pedicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            default:
-                timeEstimate = 'No estimate available';
-        }
-    }
-
-    // Set estimated time based on manicure type
-    if (manicureType !== 'NONE') {
-        switch (manicureType) {
-            case 'Regular Manicure':
-                timeEstimate = 'Approximately 1 hour';
-                break;
-            case 'Spa Manicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'Deluxe Manicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'Gel Manicure':
-                timeEstimate = 'Approximately 2 hours';
-                break;
-            case 'Paraffin Manicure':
-                timeEstimate = 'Approximately 1 hour';
-                break;
-            case 'French Manicure':
-                timeEstimate = 'Approximately 1 hour';
-                break;
-            case 'Shellac Manicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'Hot Oil Manicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            case 'Acrylic Powder Manicure':
-                timeEstimate = 'Approximately 2 hours';
-                break;
-            case 'Athletic Manicure':
-                timeEstimate = 'Approximately 1.5 hours';
-                break;
-            default:
-                timeEstimate = 'No estimate available';
-        }
-    }
-
-    // Display the estimated time in the paragraph
-    estimateMessage.innerHTML = `Estimated Time: ${timeEstimate}`;
+  estimateMessage.innerHTML = `Estimated Time: ${timeDisplay}`;
 }
-
+    
 
     function normalizeTimeStr(timeStr) {
   if (!timeStr) return null;
@@ -1570,23 +1533,26 @@ function submitBooking(event) {
   const date = document.getElementById('date').value;
   const time = document.getElementById('selectedTime').value;
 
-  const pedicureType = document.getElementById('pedicureType').value;
-  const manicureType = document.getElementById('manicureType').value;
-  const nailExtensionType = document.getElementById('nailExtensionType').value;
+  // REPLACE THIS PART - collect all services
+  const manicurePedicureType = document.getElementById('manicurePedicureType').value;
+  const polishArtType = document.getElementById('polishArtType').value;
+  const acrylicType = document.getElementById('acrylicType').value;
+  const gelType = document.getElementById('gelType').value;
+  const otherType = document.getElementById('otherType').value;
 
-  let extensionLength = '';
-  if (nailExtensionType !== 'NONE') {
-    extensionLength = document.getElementById('extensionLength').value;
-  }
+  let services = [];
+  if (manicurePedicureType !== 'NONE') services.push(manicurePedicureType);
+  if (polishArtType !== 'NONE') services.push(polishArtType);
+  if (acrylicType !== 'NONE') services.push(acrylicType);
+  if (gelType !== 'NONE') services.push(gelType);
+  if (otherType !== 'NONE') services.push(otherType);
 
-  let service = `Pedicure: ${pedicureType}, Manicure: ${manicureType}`;
-  if (nailExtensionType !== 'NONE') {
-    service += `, Nail Extension: ${nailExtensionType} (${extensionLength})`;
-  }
+  const service = services.join(', ');
 
   const bookingNumber = generateBookingNumber(name);
   const duration = getSelectedServiceDuration();
 
+  // Rest of the function continues the same...
   validateTimeSlot(date, time)
     .then((isAvailable) => {
       if (!isAvailable) {
@@ -1616,12 +1582,13 @@ function submitBooking(event) {
 
       const message = `📆 NEW NAILS BOOKING
 
-🔑 Booking #: ${bookingNumber}
+🔢 Booking #: ${bookingNumber}
 👤 Name: ${name}
 📞 Phone: ${phone}
 📆 Date: ${formattedDate}
 ⏰ Time: ${time}
-💅 Service: ${service}`;
+💅 Service: ${service}
+⏱️ Duration: ${Math.floor(duration/60)}h ${duration%60}m`;
 
       const telegramBotToken = "7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8";
       const telegramChatId = "-1002734216867";
@@ -1644,52 +1611,23 @@ function submitBooking(event) {
 
         document.querySelector("#bookingModal h3").style.display = "none";
         document.querySelector("#bookingModal p").innerHTML = `
-          <div style="
-            text-align:center; 
-            padding:15px; 
-            font-family:Arial,sans-serif; 
-            color:#333;
-            max-width:400px;
-            margin:0 auto;
-            background:white;
-            border-radius:8px;
-            box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+          <div style="text-align:center; padding:15px; font-family:Arial,sans-serif; color:#333; max-width:400px; margin:0 auto; background:white; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
             <h2 style="margin:0 0 8px 0; font-size:20px; font-weight:bold;">BOOKING CONFIRMED</h2>
-            <p style="font-size:16px; margin:0 0 12px 0;">
-             Your Booking #: <strong>${bookingNumber}</strong>
-            </p>
+            <p style="font-size:16px; margin:0 0 12px 0;">Your Booking #: <strong>${bookingNumber}</strong></p>
             <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
-            <p style="font-size:13px; line-height:1.4; margin:8px 0;">
-              <strong>$4,000 (JMD)</strong> must be transferred within <strong>48 hours</strong> 
-             to the account below or your booking will be <span style="color:red; font-weight:bold;">cancelled</span>.
-            </p>
-            <p style="font-size:15px; margin:8px 0; color:#6c2eb9; font-weight:bold;">
-              💵 Deposit Due: JMD $4,000.00
-            </p>
+            <p style="font-size:13px; line-height:1.4; margin:8px 0;"><strong>$4,000 (JMD)</strong> must be transferred within <strong>48 hours</strong> to the account below or your booking will be <span style="color:red; font-weight:bold;">cancelled</span>.</p>
+            <p style="font-size:15px; margin:8px 0; color:#6c2eb9; font-weight:bold;">💵 Deposit Due: JMD $4,000.00</p>
             <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
             <h3 style="font-size:14px; margin:8px 0;">Banking Details:</h3>
             <div style="font-size:12px; text-align:left; margin:8px 0;">
-              <p style="margin:3px 0;">🏦 Bank: <strong>Your Bank Name</strong></p>
+              <p style="margin:3px 0;">🏦 Bank: <strong>First Caribbean Bank</strong></p>
               <p style="margin:3px 0;">👤 Account: <strong>Marissa Persaud</strong></p>
               <p style="margin:3px 0;">#️⃣ Number: <strong>100806148</strong></p>
               <p style="margin:3px 0;">🏢 Branch: <strong>Port Maria Branch, Jamaica</strong></p>
             </div>
             <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
-            <p style="font-size:11px; color:#666; margin:8px 0;">
-              ℹ️ If you need to see the banking info again it is always visible in the <strong>PAYMENT INFO</strong> section of the menu
-            </p>
-            <button onclick="closeBookingModal()" style="
-              margin-top:15px; 
-              padding:10px 25px; 
-              background:#6c2eb9; 
-              color:white; 
-              border:none; 
-              border-radius:5px; 
-              font-size:14px; 
-              cursor:pointer;
-              font-weight:bold;">
-              OK
-            </button>
+            <p style="font-size:11px; color:#666; margin:8px 0;">ℹ️ If you need to see the banking info again it is always visible in the <strong>PAYMENT INFO</strong> section of the menu</p>
+            <button onclick="closeBookingModal()" style="margin-top:15px; padding:10px 25px; background:#6c2eb9; color:white; border:none; border-radius:5px; font-size:14px; cursor:pointer; font-weight:bold;">OK</button>
           </div>
         `;
         document.getElementById('bookingModal').style.display = 'flex';
@@ -1701,6 +1639,7 @@ function submitBooking(event) {
     });
 }
 
+    
 // The closeBookingModal() function should already exist in your HTML/existing JavaScript
 // Add this function to close the modal
 function closeBookingModal() {
@@ -2119,39 +2058,41 @@ function getBufferForSelectedServices() {
   return buffer;
 }
 
-// ✅ Service durations in minutes
+
 const serviceDurations = {
-  // Pedicure services
-  "Regular Pedicure": 60,
-  "Spa Pedicure": 90,
-  "Deluxe Pedicure": 90,
-  "Gel Pedicure": 120,
-  "Paraffin Pedicure": 60,
-  "Hot Stone Pedicure": 90,
-  "French Pedicure": 60,
-  "Shellac Pedicure": 90,
-  "Fish Pedicure": 60,
-  "Athletic Pedicure": 90,
-  
-  // Manicure services
-  "Regular Manicure": 60,
-  "Spa Manicure": 90,
-  "Deluxe Manicure": 90,
-  "Gel Manicure": 120,
-  "Paraffin Manicure": 60,
-  "French Manicure": 60,
-  "Shellac Manicure": 90,
-  "Hot Oil Manicure": 90,
-  "Acrylic Powder Manicure": 120,
-  "Athletic Manicure": 90,
-  
-  // Extensions (additional time on top of other services)
-  "Extension_Almond": 60,
-  "Extension_Stiletto": 75,
-  "Extension_Square": 60,
-  "Extension_Coffin": 70,
-  "Extension_Oval": 60,
-  
+  // Current service names from HTML dropdowns
+  "Female Manicure": 60,
+  "Female Pedicure": 90,
+  "Men's Manicure": 60,
+  "Men's Pedicure": 120,
+  "Gel Polish Fingers": 45,
+  "Gel Polish Toes": 60,
+  "French Toes": 60,
+  "Hand Painted French": 60,
+  "Nail Art": 30,
+  "XL Full Set": 150,
+  "Long Full Set": 135,
+  "Medium Full Set": 120,
+  "Short Full Set": 105,
+  "Oval/Almond Medium": 135,
+  "Oval Faded French (Medium)": 150,
+  "Coffin": 120,
+  "Nail Overlay (Short)": 90,
+  "Overlay & Gel Polish": 135,
+  "Refill & Gel Polish": 105,
+  "Refill My Work (2–3 Weeks)": 75,
+  "Reshape & Cutdown Nails": 45,
+  "Acrylic All Toes": 90,
+  "Acrylic Big Toes": 60,
+  "Fix Acrylic Toes": 45,
+  "Refill Toes": 60,
+  "Gel X (Long)": 150,
+  "Gel X (Medium)": 135,
+  "Rebalanced Structured Gel": 105,
+  "Soak Off Acrylic Fingers & Clean Up": 45,
+  "Soak Off Toes": 30,
+  "Gem Application": 15,
+  "Hair Brush": 15,
   "NONE": 0
 };
 
@@ -2206,46 +2147,54 @@ function isTimeSlotInPast(selectedDate, timeString) {
 
 // Updated getSelectedServiceDuration to properly sum multiple services
 function getSelectedServiceDuration() {
-  const pedicure = document.getElementById('pedicureType')?.value || "NONE";
-  const manicure = document.getElementById('manicureType')?.value || "NONE";
-  const nailExtension = document.getElementById('nailExtensionType')?.value || "NONE";
+  const manicurePedicureType = document.getElementById('manicurePedicureType')?.value || "NONE";
+  const polishArtType = document.getElementById('polishArtType')?.value || "NONE";
+  const acrylicType = document.getElementById('acrylicType')?.value || "NONE";
+  const gelType = document.getElementById('gelType')?.value || "NONE";
+  const otherType = document.getElementById('otherType')?.value || "NONE";
 
   let totalDuration = 0;
 
-  // Add pedicure duration
-  if (pedicure !== "NONE") {
-    totalDuration += serviceDurations[pedicure] || 60;
+  if (manicurePedicureType !== "NONE") {
+    totalDuration += serviceDurations[manicurePedicureType] || 60;
   }
-
-  // Add manicure duration  
-  if (manicure !== "NONE") {
-    totalDuration += serviceDurations[manicure] || 60;
+  if (polishArtType !== "NONE") {
+    totalDuration += serviceDurations[polishArtType] || 30;
   }
-
-  // Add extension time (additional to other services)
-  if (nailExtension !== "NONE") {
-    totalDuration += 60; // extensions add extra time
+  if (acrylicType !== "NONE") {
+    totalDuration += serviceDurations[acrylicType] || 60;
+  }
+  if (gelType !== "NONE") {
+    totalDuration += serviceDurations[gelType] || 60;
+  }
+  if (otherType !== "NONE") {
+    totalDuration += serviceDurations[otherType] || 30;
   }
 
   return totalDuration || 60; // minimum 1 hour
 }
 
-async function loadAvailableSlots() {
+
+    async function loadAvailableSlots() {
   const date = document.getElementById('date').value;
-  const pedicure = document.getElementById('pedicureType')?.value || "NONE";
-  const manicure = document.getElementById('manicureType')?.value || "NONE";
-  const nailExtension = document.getElementById('nailExtensionType')?.value || "NONE";
+  const manicurePedicureType = document.getElementById('manicurePedicureType')?.value || "NONE";
+  const polishArtType = document.getElementById('polishArtType')?.value || "NONE";
+  const acrylicType = document.getElementById('acrylicType')?.value || "NONE";
+  const gelType = document.getElementById('gelType')?.value || "NONE";
+  const otherType = document.getElementById('otherType')?.value || "NONE";
 
   const timeSelect = document.getElementById('selectedTime');
   timeSelect.innerHTML = "<option value=''>-- Select a time --</option>";
 
   // Must have a date + at least one service
-  if (!date || (pedicure === "NONE" && manicure === "NONE" && nailExtension === "NONE")) {
+  if (!date || (manicurePedicureType === "NONE" && polishArtType === "NONE" && 
+      acrylicType === "NONE" && gelType === "NONE" && otherType === "NONE")) {
     timeSelect.innerHTML = "<option value=''>COMPLETE FORM TO SEE AVAILABLE SLOTS</option>";
     return;
   }
 
   const duration = getSelectedServiceDuration();
+  console.log("Service duration:", duration, "minutes"); // Debug log
 
   const dayName = new Date(date + "T00:00:00").toLocaleDateString('en-US', { weekday: 'long' });
   const business = businessHours[dayName];
@@ -2258,7 +2207,7 @@ async function loadAvailableSlots() {
   const closeMinutes = convertToMinutes(business.close);
 
   try {
-    // Fetch existing bookings
+    // Rest of the function remains the same...
     const snapshot = await db.collection("bookings")
       .where("date", "==", date)
       .get();
@@ -2269,7 +2218,6 @@ async function loadAvailableSlots() {
       return { start: bookedTime, end: bookedTime + bookedDuration };
     });
 
-    // Fetch unavailable time ranges
     const unavailableSnapshot = await db.collection("unavailableDays")
       .where("date", "==", date)
       .get();
@@ -2277,31 +2225,22 @@ async function loadAvailableSlots() {
     let unavailableRanges = [];
     unavailableSnapshot.forEach(doc => {
       const data = doc.data();
-
       if (data.allDay) {
         unavailableRanges.push({ start: openMinutes, end: closeMinutes });
       } else {
         const start = convertToMinutes(normalizeTimeStr(data.startTime));
         const end = convertToMinutes(normalizeTimeStr(data.endTime));
-
         if (!isNaN(start) && !isNaN(end) && end > start) {
           unavailableRanges.push({ start, end });
         }
       }
     });
 
-    console.log("Service duration:", duration, "minutes");
-    console.log("Bookings:", bookings);
-    console.log("Unavailable ranges:", unavailableRanges);
-
-    // Generate slots every 15 minutes (you can change this interval)
+    // Generate slots every 15 minutes
     for (let t = openMinutes; t <= closeMinutes - duration; t += 15) {
       const end = t + duration;
-
-      // Check for conflicts with existing bookings or unavailable periods
-      let conflict =
-        bookings.some(b => !(end <= b.start || t >= b.end)) ||
-        unavailableRanges.some(r => !(end <= r.start || t >= r.end));
+      let conflict = bookings.some(b => !(end <= b.start || t >= b.end)) ||
+                    unavailableRanges.some(r => !(end <= r.start || t >= r.end));
 
       if (!conflict) {
         const hours = Math.floor(t / 60);
@@ -2310,7 +2249,6 @@ async function loadAvailableSlots() {
         const displayHours = ((hours + 11) % 12 + 1);
         const displayTime = `${displayHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
 
-        // Check if this time slot is in the past
         if (!isTimeSlotInPast(date, displayTime)) {
           let option = document.createElement("option");
           option.value = displayTime;
@@ -2320,7 +2258,6 @@ async function loadAvailableSlots() {
       }
     }
 
-    // If no slots remain after filtering
     if (timeSelect.options.length === 1) {
       let option = document.createElement("option");
       option.value = "";
@@ -2331,39 +2268,8 @@ async function loadAvailableSlots() {
     console.error("Error loading slots:", err);
     timeSelect.innerHTML = "<option value=''>Error loading slots</option>";
   }
-}
-
-// Auto-format phone number in booking form
-document.addEventListener("DOMContentLoaded", function () {
-  const phoneInput = document.getElementById("phone");
-  if (phoneInput) {
-    phoneInput.addEventListener("input", function(e) {
-      let input = e.target.value.replace(/\D/g, ""); // only digits
-      if (input.length > 10) input = input.substring(0, 10); // max 10 digits
-
-      let formatted = input;
-
-      if (input.length > 6) {
-        formatted = `(${input.substring(0,3)}) ${input.substring(3,6)}-${input.substring(6)}`;
-      } else if (input.length > 3) {
-        formatted = `(${input.substring(0,3)}) ${input.substring(3)}`;
-      } else if (input.length > 0) {
-        formatted = `(${input}`;
-      }
-
-      e.target.value = formatted;
-    });
-  }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-  const dateInput = document.getElementById("date");
-  if (dateInput) {
-    const today = new Date().toISOString().split("T")[0]; 
-    dateInput.setAttribute("min", today); // Block past dates
-  }
-});
-
+    }
+    
 
 
 // Welcome Modal Functions
