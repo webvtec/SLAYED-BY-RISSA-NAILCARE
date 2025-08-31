@@ -1342,9 +1342,20 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
     function convertToMinutes(timeStr) {
-  let [time, period] = timeStr.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
-
+  if (!timeStr || typeof timeStr !== 'string') return 0;
+  
+  const parts = timeStr.trim().split(' ');
+  if (parts.length !== 2) return 0;
+  
+  const [time, period] = parts;
+  const [hoursStr, minutesStr] = time.split(':');
+  
+  let hours = parseInt(hoursStr, 10);
+  let minutes = parseInt(minutesStr, 10) || 0;
+  
+  if (isNaN(hours)) return 0;
+  
+  // Convert to 24-hour format
   if (period.toUpperCase() === 'PM' && hours !== 12) {
     hours += 12;
   }
@@ -1353,7 +1364,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   return (hours * 60) + minutes;
-}
+    }
 
 const businessHours = {
   'Sunday': null, // Closed
@@ -2110,33 +2121,115 @@ function getBufferForSelectedServices() {
 
 // ✅ Service durations in minutes
 const serviceDurations = {
+  // Pedicure services
   "Regular Pedicure": 60,
   "Spa Pedicure": 90,
   "Deluxe Pedicure": 90,
   "Gel Pedicure": 120,
+  "Paraffin Pedicure": 60,
+  "Hot Stone Pedicure": 90,
+  "French Pedicure": 60,
+  "Shellac Pedicure": 90,
+  "Fish Pedicure": 60,
+  "Athletic Pedicure": 90,
+  
+  // Manicure services
   "Regular Manicure": 60,
   "Spa Manicure": 90,
   "Deluxe Manicure": 90,
   "Gel Manicure": 120,
+  "Paraffin Manicure": 60,
+  "French Manicure": 60,
+  "Shellac Manicure": 90,
+  "Hot Oil Manicure": 90,
   "Acrylic Powder Manicure": 120,
+  "Athletic Manicure": 90,
+  
+  // Extensions (additional time on top of other services)
+  "Extension_Almond": 60,
+  "Extension_Stiletto": 75,
+  "Extension_Square": 60,
+  "Extension_Coffin": 70,
+  "Extension_Oval": 60,
+  
   "NONE": 0
 };
+
 
 function getSelectedServiceDuration() {
   const pedicure = document.getElementById('pedicureType')?.value || "NONE";
   const manicure = document.getElementById('manicureType')?.value || "NONE";
   const nailExtension = document.getElementById('nailExtensionType')?.value || "NONE";
 
-  let duration = 0;
+  let totalDuration = 0;
 
-  if (pedicure !== "NONE") duration += serviceDurations[pedicure] || 60;
-  if (manicure !== "NONE") duration += serviceDurations[manicure] || 60;
-  if (nailExtension !== "NONE") duration += 60; // default for extensions
+  // Add pedicure time
+  if (pedicure !== "NONE") {
+    totalDuration += serviceDurations[pedicure] || 60;
+  }
 
-  return duration || 60; // fallback
+  // Add manicure time
+  if (manicure !== "NONE") {
+    totalDuration += serviceDurations[manicure] || 60;
+  }
+
+  // Add extension time (this is additional to manicure/pedicure)
+  if (nailExtension !== "NONE") {
+    const extensionKey = `Extension_${nailExtension}`;
+    totalDuration += serviceDurations[extensionKey] || 60;
+  }
+
+  // Minimum service time
+  return totalDuration || 60;
 }
 
-// ✅ FINAL version — only one loadAvailableSlots() now
+
+    
+
+// Helper function to check if a time slot is in the past
+function isTimeSlotInPast(selectedDate, timeString) {
+  const now = new Date();
+  const selectedDateTime = new Date(selectedDate + 'T00:00:00');
+  
+  // If it's not today, it's not in the past
+  if (selectedDateTime.toDateString() !== now.toDateString()) {
+    return false;
+  }
+  
+  // If it's today, check if the time has passed
+  const timeMinutes = convertToMinutes(timeString);
+  const currentMinutes = (now.getHours() * 60) + now.getMinutes();
+  
+  // Add 30-minute buffer - can't book slots that start within 30 minutes
+  return timeMinutes <= (currentMinutes + 30);
+}
+
+// Updated getSelectedServiceDuration to properly sum multiple services
+function getSelectedServiceDuration() {
+  const pedicure = document.getElementById('pedicureType')?.value || "NONE";
+  const manicure = document.getElementById('manicureType')?.value || "NONE";
+  const nailExtension = document.getElementById('nailExtensionType')?.value || "NONE";
+
+  let totalDuration = 0;
+
+  // Add pedicure duration
+  if (pedicure !== "NONE") {
+    totalDuration += serviceDurations[pedicure] || 60;
+  }
+
+  // Add manicure duration  
+  if (manicure !== "NONE") {
+    totalDuration += serviceDurations[manicure] || 60;
+  }
+
+  // Add extension time (additional to other services)
+  if (nailExtension !== "NONE") {
+    totalDuration += 60; // extensions add extra time
+  }
+
+  return totalDuration || 60; // minimum 1 hour
+}
+
 async function loadAvailableSlots() {
   const date = document.getElementById('date').value;
   const pedicure = document.getElementById('pedicureType')?.value || "NONE";
@@ -2165,7 +2258,7 @@ async function loadAvailableSlots() {
   const closeMinutes = convertToMinutes(business.close);
 
   try {
-    // ✅ Fetch bookings
+    // Fetch existing bookings
     const snapshot = await db.collection("bookings")
       .where("date", "==", date)
       .get();
@@ -2176,7 +2269,7 @@ async function loadAvailableSlots() {
       return { start: bookedTime, end: bookedTime + bookedDuration };
     });
 
-    // ✅ Fetch unavailable ranges
+    // Fetch unavailable time ranges
     const unavailableSnapshot = await db.collection("unavailableDays")
       .where("date", "==", date)
       .get();
@@ -2191,22 +2284,21 @@ async function loadAvailableSlots() {
         const start = convertToMinutes(normalizeTimeStr(data.startTime));
         const end = convertToMinutes(normalizeTimeStr(data.endTime));
 
-        // ✅ Only add if both are valid numbers and end > start
         if (!isNaN(start) && !isNaN(end) && end > start) {
           unavailableRanges.push({ start, end });
         }
       }
     });
 
-    // 🔍 Debug output (remove later)
+    console.log("Service duration:", duration, "minutes");
     console.log("Bookings:", bookings);
     console.log("Unavailable ranges:", unavailableRanges);
 
-    // ✅ Generate slots every 5 minutes
-    for (let t = openMinutes; t <= closeMinutes - duration; t += 5) {
+    // Generate slots every 15 minutes (you can change this interval)
+    for (let t = openMinutes; t <= closeMinutes - duration; t += 15) {
       const end = t + duration;
 
-      // Skip if overlaps with any booking or unavailable range
+      // Check for conflicts with existing bookings or unavailable periods
       let conflict =
         bookings.some(b => !(end <= b.start || t >= b.end)) ||
         unavailableRanges.some(r => !(end <= r.start || t >= r.end));
@@ -2218,14 +2310,17 @@ async function loadAvailableSlots() {
         const displayHours = ((hours + 11) % 12 + 1);
         const displayTime = `${displayHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
 
-        let option = document.createElement("option");
-        option.value = displayTime;
-        option.textContent = displayTime;
-        timeSelect.appendChild(option);
+        // Check if this time slot is in the past
+        if (!isTimeSlotInPast(date, displayTime)) {
+          let option = document.createElement("option");
+          option.value = displayTime;
+          option.textContent = displayTime;
+          timeSelect.appendChild(option);
+        }
       }
     }
 
-    // If no slots remain
+    // If no slots remain after filtering
     if (timeSelect.options.length === 1) {
       let option = document.createElement("option");
       option.value = "";
@@ -2238,8 +2333,7 @@ async function loadAvailableSlots() {
   }
 }
 
-
-    // ✅ Auto-format phone number in booking form
+// Auto-format phone number in booking form
 document.addEventListener("DOMContentLoaded", function () {
   const phoneInput = document.getElementById("phone");
   if (phoneInput) {
@@ -2266,9 +2360,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const dateInput = document.getElementById("date");
   if (dateInput) {
     const today = new Date().toISOString().split("T")[0]; 
-    dateInput.setAttribute("min", today); // ✅ Block past dates
+    dateInput.setAttribute("min", today); // Block past dates
   }
 });
+
 
 
 // Welcome Modal Functions
