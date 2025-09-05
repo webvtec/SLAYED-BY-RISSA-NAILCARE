@@ -1374,9 +1374,10 @@ function selectPeriod(period) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  showSection('gallerySection');
-  loadGallery('galleryDisplay');
+document.addEventListener("DOMContentLoaded", function () {
+  const dateInput = document.getElementById("date");
+  const today = new Date().toISOString().split("T")[0]; 
+  dateInput.setAttribute("min", today); // ✅ Blocks and grays out past dates
 });
 
     function convertToMinutes(timeStr) {
@@ -1556,6 +1557,7 @@ function validateTimeSlot(date, selectedTime) {
         });
     });
 }
+
 
 
 function generateBookingNumber(name) {
@@ -3115,15 +3117,6 @@ async function loadDiscountInfo() {
   }
 }
 
-
-// ADD this code to your existing JavaScript to prevent past dates
-document.addEventListener('DOMContentLoaded', function() {
-  const dateInput = document.getElementById('date');
-  if (dateInput) {
-    // Set minimum date to today
-    const today = new Date();
-    const todayString = today.toISOString().split('T')[0];
-    dateInput.min = todayString;
     
     // Also set it whenever the booking section is shown
     const originalShowSection = showSection;
