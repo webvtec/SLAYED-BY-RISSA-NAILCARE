@@ -1683,7 +1683,7 @@ async function submitBooking(event) {
     document.getElementById('bookingModal').style.display = 'flex';
 
     // Show review prompt after confirmation modal is closed
-    showReviewPrompt(bookingNumber);
+showReviewPrompt(bookingNumber, date, time, service);
 
   } catch (error) {
     console.error("Booking error:", error);
@@ -2186,23 +2186,54 @@ function getSelectedServiceDuration() {
 
     
 
-// Helper function to check if a time slot is in the past
+// REPLACE your existing isTimeSlotInPast function with this:
 function isTimeSlotInPast(selectedDate, timeString) {
   const now = new Date();
   const selectedDateTime = new Date(selectedDate + 'T00:00:00');
   
-  // If it's not today, it's not in the past
+  // If it's not today, check if the date is in the past
   if (selectedDateTime.toDateString() !== now.toDateString()) {
-    return false;
+    return selectedDateTime < now;
   }
   
   // If it's today, check if the time has passed
   const timeMinutes = convertToMinutes(timeString);
   const currentMinutes = (now.getHours() * 60) + now.getMinutes();
   
-  // Add 30-minute buffer - can't book slots that start within 30 minutes
-  return timeMinutes <= (currentMinutes + 30);
+  // Add 60-minute buffer - can't book slots that start within 60 minutes
+  return timeMinutes <= (currentMinutes + 60);
 }
+
+// ALSO UPDATE your loadAvailableSlots function - find this part and replace it:
+// Look for this section in your loadAvailableSlots function:
+/*
+  // Generate slots every 15 minutes
+  for (let t = openMinutes; t <= closeMinutes - duration; t += 5) {
+*/
+
+// Replace the entire for loop with this:
+for (let t = openMinutes; t <= closeMinutes - duration; t += 15) { // Changed from 5 to 15 minute intervals
+  const end = t + duration;
+  let conflict = bookings.some(b => !(end <= b.start || t >= b.end)) ||
+                unavailableRanges.some(r => !(end <= r.start || t >= r.end));
+
+  if (!conflict) {
+    const hours = Math.floor(t / 60);
+    const minutes = t % 60;
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const displayHours = ((hours + 11) % 12 + 1);
+    const displayTime = `${displayHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+
+    // Check if this time slot is not in the past
+    if (!isTimeSlotInPast(date, displayTime)) {
+      let option = document.createElement("option");
+      option.value = displayTime;
+      option.textContent = displayTime;
+      timeSelect.appendChild(option);
+    }
+  }
+}
+    
 
 // Updated getSelectedServiceDuration to properly sum multiple services
 function getSelectedServiceDuration() {
@@ -2930,15 +2961,31 @@ async function checkAndApplyDiscount(userId) {
   }
 }
 
-// Function to show review prompt after booking
-function showReviewPrompt(bookingNumber) {
+// REPLACE your existing showReviewPrompt function with this:
+function showReviewPrompt(bookingNumber, bookingDate, bookingTime, services) {
   setTimeout(() => {
+    // Format the date nicely
+    const [year, month, day] = bookingDate.split("-");
+    const formattedDate = new Date(year, month - 1, day).toLocaleDateString("en-US", {
+      weekday: 'long',
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
     Swal.fire({
       title: "How was your experience?",
       html: `
         <div style="text-align:center; padding:20px;">
-          <p style="font-size:16px; margin-bottom:20px;">
-            We'd love to hear about your experience with booking #${bookingNumber}!
+          <div style="background:#f8f9fa; border-radius:8px; padding:15px; margin:15px 0; border-left:4px solid #E58BBE;">
+            <h4 style="margin:0 0 8px 0; color:#333;">Your Booking Details:</h4>
+            <p style="margin:5px 0; font-size:14px;"><strong>Booking #:</strong> ${bookingNumber}</p>
+            <p style="margin:5px 0; font-size:14px;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin:5px 0; font-size:14px;"><strong>Time:</strong> ${bookingTime}</p>
+            <p style="margin:5px 0; font-size:14px;"><strong>Services:</strong> ${services}</p>
+          </div>
+          <p style="font-size:16px; margin:15px 0; color:#333;">
+            We'd love to hear about your experience!
           </p>
           <p style="font-size:14px; color:#666;">
             Your feedback helps us improve our service.
@@ -2950,6 +2997,7 @@ function showReviewPrompt(bookingNumber) {
       cancelButtonText: "Maybe Later",
       confirmButtonColor: "#E58BBE",
       cancelButtonColor: "#ccc",
+      width: 500,
       customClass: {
         popup: "swal2-rounded"
       }
@@ -2957,9 +3005,17 @@ function showReviewPrompt(bookingNumber) {
       if (result.isConfirmed) {
         closeMenu();
         showSection('reviewsSection');
-        // Scroll to review form
+        // Scroll to review form and pre-fill booking number in the name field if empty
         setTimeout(() => {
-          document.getElementById('reviewForm').scrollIntoView({ behavior: 'smooth' });
+          const reviewForm = document.getElementById('reviewForm');
+          const nameField = document.getElementById('reviewName');
+          reviewForm.scrollIntoView({ behavior: 'smooth' });
+          
+          // If name field is empty, suggest using booking number format
+          if (!nameField.value.trim()) {
+            nameField.focus();
+            nameField.placeholder = `Customer from Booking #${bookingNumber}`;
+          }
         }, 500);
       }
     });
@@ -3049,6 +3105,29 @@ async function loadDiscountInfo() {
   }
 }
 
+
+// ADD this code to your existing JavaScript to prevent past dates
+document.addEventListener('DOMContentLoaded', function() {
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    // Set minimum date to today
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+    dateInput.min = todayString;
+    
+    // Also set it whenever the booking section is shown
+    const originalShowSection = showSection;
+    showSection = function(sectionId) {
+      originalShowSection(sectionId);
+      if (sectionId === 'bookingSection') {
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        document.getElementById('date').min = todayString;
+        loadDiscountInfo();
+      }
+    };
+  }
+});
 
     
   </script>
