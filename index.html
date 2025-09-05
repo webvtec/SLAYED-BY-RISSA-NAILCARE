@@ -492,6 +492,44 @@
 
 
 
+    /* Add this CSS to the end of your existing <style> section */
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.discount-highlight {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.booking-progress {
+  background: linear-gradient(135deg, #2196F3, #1976D2);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+/* Enhanced SweetAlert styling */
+.swal2-rounded {
+  border-radius: 15px !important;
+}
+
+.swal2-popup {
+  font-family: 'Zilla Slab', serif !important;
+}
+
   </style>
 </head>
 <body>
@@ -1516,8 +1554,7 @@ function generateBookingNumber(name) {
   return initials + digits;
 }
 
-
-function submitBooking(event) {
+async function submitBooking(event) {
   event.preventDefault();
 
   const user = firebase.auth().currentUser;
@@ -1532,6 +1569,9 @@ function submitBooking(event) {
   const phone = document.getElementById('phone').value.trim();
   const date = document.getElementById('date').value;
   const time = document.getElementById('selectedTime').value;
+
+  // Check discount status
+  const discountInfo = await checkAndApplyDiscount(user.uid);
 
   // REPLACE THIS PART - collect all services
   const manicurePedicureType = document.getElementById('manicurePedicureType').value;
@@ -1552,93 +1592,105 @@ function submitBooking(event) {
   const bookingNumber = generateBookingNumber(name);
   const duration = getSelectedServiceDuration();
 
-  // Rest of the function continues the same...
-  validateTimeSlot(date, time)
-    .then((isAvailable) => {
-      if (!isAvailable) {
-        alert('This time is not available. Please choose another time.');
-        return;
-      }
+  try {
+    // Validate time slot availability
+    const isAvailable = await validateTimeSlot(date, time);
+    if (!isAvailable) {
+      alert('This time is not available. Please choose another time.');
+      return;
+    }
 
-      return db.collection('bookings').add({
-        uid: user.uid,
-        bookingNumber,
-        name,
-        phone,
-        date: date,
-        time,
-        service,
-        duration,
-        deposit: "No"
-      });
-    })
-    .then(() => {
-      const [year, month, day] = date.split("-");
-      const formattedDate = new Date(year, month - 1, day).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+    // Save booking to database
+    await db.collection('bookings').add({
+      uid: user.uid,
+      bookingNumber,
+      name,
+      phone,
+      date: date,
+      time,
+      service,
+      duration,
+      deposit: "No",
+      hasDiscount: discountInfo.isDiscountBooking,
+      discountAmount: discountInfo.isDiscountBooking ? 10 : 0
+    });
 
-      const message = `📆 NEW NAILS BOOKING
+    // Send Telegram notification
+    const [year, month, day] = date.split("-");
+    const formattedDate = new Date(year, month - 1, day).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-🔢 Booking #: ${bookingNumber}
+    const discountText = discountInfo.isDiscountBooking ? '\n🎉 10% DISCOUNT APPLIED!' : '';
+    
+    const message = `📆 NEW NAILS BOOKING
+
+📢 Booking #: ${bookingNumber}
 👤 Name: ${name}
 📞 Phone: ${phone}
 📆 Date: ${formattedDate}
 ⏰ Time: ${time}
 💅 Service: ${service}
-⏱️ Duration: ${Math.floor(duration/60)}h ${duration%60}m`;
+⏱️ Duration: ${Math.floor(duration/60)}h ${duration%60}m${discountText}`;
 
-      const telegramBotToken = "7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8";
-      const telegramChatId = "-1002734216867";
+    const telegramBotToken = "7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8";
+    const telegramChatId = "-1002734216867";
 
-      return fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: telegramChatId,
-          text: message,
-          parse_mode: "HTML"
-        })
-      });
-    })
-    .then((response) => {
-      if (response.ok) {
-        document.querySelector("#bookingSection form").reset();
-        document.getElementById("estimateTimeMessage").innerHTML = "";
-        document.getElementById("selectedTime").innerHTML = "<option value=''>Pick date & service first</option>";
-
-        document.querySelector("#bookingModal h3").style.display = "none";
-        document.querySelector("#bookingModal p").innerHTML = `
-          <div style="text-align:center; padding:15px; font-family:Arial,sans-serif; color:#333; max-width:400px; margin:0 auto; background:white; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
-            <h2 style="margin:0 0 8px 0; font-size:20px; font-weight:bold;">BOOKING CONFIRMED</h2>
-            <p style="font-size:16px; margin:0 0 12px 0;">Your Booking #: <strong>${bookingNumber}</strong></p>
-            <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
-            <p style="font-size:13px; line-height:1.4; margin:8px 0;"><strong>$4,000 (JMD)</strong> must be transferred within <strong>48 hours</strong> to the account below or your booking will be <span style="color:red; font-weight:bold;">cancelled</span>.</p>
-            <p style="font-size:15px; margin:8px 0; color:#6c2eb9; font-weight:bold;">💵 Deposit Due: JMD $4,000.00</p>
-            <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
-            <h3 style="font-size:14px; margin:8px 0;">Banking Details:</h3>
-            <div style="font-size:12px; text-align:left; margin:8px 0;">
-              <p style="margin:3px 0;">🏦 Bank: <strong>First Caribbean Bank</strong></p>
-              <p style="margin:3px 0;">👤 Account: <strong>Marissa Persaud</strong></p>
-              <p style="margin:3px 0;">#️⃣ Number: <strong>100806148</strong></p>
-              <p style="margin:3px 0;">🏢 Branch: <strong>Port Maria Branch, Jamaica</strong></p>
-            </div>
-            <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
-            <p style="font-size:11px; color:#666; margin:8px 0;">ℹ️ If you need to see the banking info again it is always visible in the <strong>PAYMENT INFO</strong> section of the menu</p>
-            <button onclick="closeBookingModal()" style="margin-top:15px; padding:10px 25px; background:#6c2eb9; color:white; border:none; border-radius:5px; font-size:14px; cursor:pointer; font-weight:bold;">OK</button>
-          </div>
-        `;
-        document.getElementById('bookingModal').style.display = 'flex';
-      }
-    })
-    .catch((err) => {
-      console.error("Booking error:", err);
-      alert("Failed to save booking. Please try again.");
+    await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: telegramChatId,
+        text: message,
+        parse_mode: "HTML"
+      })
     });
-}
 
+    // Reset form
+    document.querySelector("#bookingSection form").reset();
+    document.getElementById("estimateTimeMessage").innerHTML = "";
+    document.getElementById("selectedTime").innerHTML = "<option value=''>Pick date & service first</option>";
+
+    // Show booking confirmation
+    const discountNote = discountInfo.isDiscountBooking ? 
+      '<p style="color:green; font-weight:bold; margin:8px 0;">🎉 10% discount applied to this booking!</p>' : '';
+
+    document.querySelector("#bookingModal h3").style.display = "none";
+    document.querySelector("#bookingModal p").innerHTML = `
+      <div style="text-align:center; padding:15px; font-family:Arial,sans-serif; color:#333; max-width:400px; margin:0 auto; background:white; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+        <h2 style="margin:0 0 8px 0; font-size:20px; font-weight:bold;">BOOKING CONFIRMED</h2>
+        <p style="font-size:16px; margin:0 0 12px 0;">Your Booking #: <strong>${bookingNumber}</strong></p>
+        ${discountNote}
+        <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
+        <p style="font-size:13px; line-height:1.4; margin:8px 0;"><strong>$4,000 (JMD)</strong> must be transferred within <strong>48 hours</strong> to the account below or your booking will be <span style="color:red; font-weight:bold;">cancelled</span>.</p>
+        <p style="font-size:15px; margin:8px 0; color:#6c2eb9; font-weight:bold;">💵 Deposit Due: JMD $4,000.00</p>
+        <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
+        <h3 style="font-size:14px; margin:8px 0;">Banking Details:</h3>
+        <div style="font-size:12px; text-align:left; margin:8px 0;">
+          <p style="margin:3px 0;">🏦 Bank: <strong>First Caribbean Bank</strong></p>
+          <p style="margin:3px 0;">👤 Account: <strong>Marissa Persaud</strong></p>
+          <p style="margin:3px 0;">#️⃣ Number: <strong>100806148</strong></p>
+          <p style="margin:3px 0;">🏢 Branch: <strong>Port Maria Branch, Jamaica</strong></p>
+        </div>
+        <hr style="margin:12px 0; border:0; height:1px; background:#ddd;">
+        <p style="font-size:11px; color:#666; margin:8px 0;">ℹ️ If you need to see the banking info again it is always visible in the <strong>PAYMENT INFO</strong> section of the menu</p>
+        <button onclick="closeBookingModal()" style="margin-top:15px; padding:10px 25px; background:#6c2eb9; color:white; border:none; border-radius:5px; font-size:14px; cursor:pointer; font-weight:bold;">OK</button>
+      </div>
+    `;
+    
+    document.getElementById('bookingModal').style.display = 'flex';
+
+    // Show review prompt after confirmation modal is closed
+    showReviewPrompt(bookingNumber);
+
+  } catch (error) {
+    console.error("Booking error:", error);
+    alert("Failed to save booking. Please try again.");
+  }
+}
+    
     
 // The closeBookingModal() function should already exist in your HTML/existing JavaScript
 // Add this function to close the modal
@@ -1652,7 +1704,9 @@ function closeBookingModal() {
 }
 
 
-    function showSection(sectionId) {
+    // UPDATE YOUR EXISTING showSection FUNCTION
+// Find your showSection function and replace it with this updated version:
+function showSection(sectionId) {
   document.querySelectorAll('.content-section').forEach(section =>
     section.classList.remove('active')
   );
@@ -1661,7 +1715,12 @@ function closeBookingModal() {
   if (sectionId === 'gallerySection') {
     loadGallery('galleryDisplay');
   } else if (sectionId === 'reviewsSection') {
-    loadReviews(currentUser); // ✅ Pass the user here
+    loadReviews(currentUser);
+  } else if (sectionId === 'productsSection') {
+    loadProducts();
+  } else if (sectionId === 'bookingSection') {
+    // Load discount info when booking section is opened
+    loadDiscountInfo();
   }
 }
 
@@ -2845,6 +2904,151 @@ ${orderSummary}
     knutsfordSelect.value = ""; // clear hidden select
   }
 }
+
+
+// Function to check and apply discount
+async function checkAndApplyDiscount(userId) {
+  try {
+    // Get user's completed bookings count
+    const bookingsSnapshot = await db.collection('bookings')
+      .where('uid', '==', userId)
+      .get();
+    
+    const bookingCount = bookingsSnapshot.size;
+    
+    // Check if user qualifies for discount (every 3rd booking)
+    const isDiscountBooking = (bookingCount + 1) % 3 === 0 && bookingCount >= 2;
+    
+    return {
+      isDiscountBooking,
+      bookingCount: bookingCount + 1,
+      nextDiscountIn: isDiscountBooking ? 0 : 3 - ((bookingCount + 1) % 3)
+    };
+  } catch (error) {
+    console.error('Error checking discount:', error);
+    return { isDiscountBooking: false, bookingCount: 1, nextDiscountIn: 2 };
+  }
+}
+
+// Function to show review prompt after booking
+function showReviewPrompt(bookingNumber) {
+  setTimeout(() => {
+    Swal.fire({
+      title: "How was your experience?",
+      html: `
+        <div style="text-align:center; padding:20px;">
+          <p style="font-size:16px; margin-bottom:20px;">
+            We'd love to hear about your experience with booking #${bookingNumber}!
+          </p>
+          <p style="font-size:14px; color:#666;">
+            Your feedback helps us improve our service.
+          </p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Leave a Review",
+      cancelButtonText: "Maybe Later",
+      confirmButtonColor: "#E58BBE",
+      cancelButtonColor: "#ccc",
+      customClass: {
+        popup: "swal2-rounded"
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        closeMenu();
+        showSection('reviewsSection');
+        // Scroll to review form
+        setTimeout(() => {
+          document.getElementById('reviewForm').scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+      }
+    });
+  }, 2000); // Show prompt 2 seconds after booking confirmation
+}
+
+// Function to display discount info in booking form
+function displayDiscountInfo(discountInfo) {
+  const existingDiscountDiv = document.getElementById('discountInfo');
+  if (existingDiscountDiv) {
+    existingDiscountDiv.remove();
+  }
+
+  const bookingForm = document.querySelector('#bookingSection form');
+  const discountDiv = document.createElement('div');
+  discountDiv.id = 'discountInfo';
+  discountDiv.style.cssText = `
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    animation: pulse 2s infinite;
+  `;
+
+  if (discountInfo.isDiscountBooking) {
+    discountDiv.innerHTML = `
+      <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">
+        🎉 CONGRATULATIONS! 🎉
+      </div>
+      <div style="font-size: 16px; margin-bottom: 5px;">
+        This is your ${discountInfo.bookingCount}rd booking!
+      </div>
+      <div style="font-size: 14px; margin-bottom: 8px;">
+        You get a <strong>10% DISCOUNT</strong> on this booking!
+      </div>
+      <div style="font-size: 12px; opacity: 0.9;">
+        The discount will be applied to your final bill
+      </div>
+    `;
+  } else {
+    discountDiv.style.background = 'linear-gradient(135deg, #2196F3, #1976D2)';
+    discountDiv.innerHTML = `
+      <div style="font-size: 16px; margin-bottom: 5px;">
+        📊 Booking Progress
+      </div>
+      <div style="font-size: 14px; margin-bottom: 5px;">
+        This will be booking #${discountInfo.bookingCount}
+      </div>
+      <div style="font-size: 13px;">
+        ${discountInfo.nextDiscountIn} more booking${discountInfo.nextDiscountIn > 1 ? 's' : ''} until your next 10% discount!
+      </div>
+    `;
+  }
+
+  const submitButton = bookingForm.querySelector('button[type="submit"]');
+  bookingForm.insertBefore(discountDiv, submitButton);
+
+  // Add pulse animation CSS if not already added
+  if (!document.getElementById('pulseAnimation')) {
+    const style = document.createElement('style');
+    style.id = 'pulseAnimation';
+    style.textContent = `
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+
+        // Function to load discount info when user opens booking section
+async function loadDiscountInfo() {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+
+  try {
+    const discountInfo = await checkAndApplyDiscount(user.uid);
+    displayDiscountInfo(discountInfo);
+  } catch (error) {
+    console.error('Error loading discount info:', error);
+  }
+}
+
 
     
   </script>
