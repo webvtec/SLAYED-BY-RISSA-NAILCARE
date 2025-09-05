@@ -2131,7 +2131,7 @@ function closeMyBookings() {
     }
 
 function getBufferForSelectedServices() {
-  let buffer = 30; // default
+  let buffer = 0; // default
 
   const pedicureType = document.getElementById('pedicureType')?.value || "NONE";
   const manicureType = document.getElementById('manicureType')?.value || "NONE";
@@ -2228,16 +2228,10 @@ function isTimeSlotInPast(selectedDate, timeString) {
   const timeMinutes = convertToMinutes(timeString);
   const currentMinutes = (now.getHours() * 60) + now.getMinutes();
   
-  // Add 60-minute buffer - can't book slots that start within 60 minutes
-  return timeMinutes <= (currentMinutes + 60);
+  // No buffer — only mark as past if it's earlier than the current time
+  return timeMinutes <= currentMinutes;
 }
 
-// ALSO UPDATE your loadAvailableSlots function - find this part and replace it:
-// Look for this section in your loadAvailableSlots function:
-/*
-  // Generate slots every 15 minutes
-  for (let t = openMinutes; t <= closeMinutes - duration; t += 5) {
-*/
 
 // Replace the entire for loop with this:
 for (let t = openMinutes; t <= closeMinutes - duration; t += 15) { // Changed from 5 to 15 minute intervals
@@ -2354,7 +2348,7 @@ function getSelectedServiceDuration() {
       }
     });
 
-    // Generate slots every 15 minutes
+    // Generate slots every 5 minutes
     for (let t = openMinutes; t <= closeMinutes - duration; t += 5) {
       const end = t + duration;
       let conflict = bookings.some(b => !(end <= b.start || t >= b.end)) ||
@@ -2989,66 +2983,6 @@ async function checkAndApplyDiscount(userId) {
   }
 }
 
-// REPLACE your existing showReviewPrompt function with this:
-function showReviewPrompt(bookingNumber, bookingDate, bookingTime, services) {
-  setTimeout(() => {
-    // Format the date nicely
-    const [year, month, day] = bookingDate.split("-");
-    const formattedDate = new Date(year, month - 1, day).toLocaleDateString("en-US", {
-      weekday: 'long',
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-    Swal.fire({
-      title: "How was your experience?",
-      html: `
-        <div style="text-align:center; padding:20px;">
-          <div style="background:#f8f9fa; border-radius:8px; padding:15px; margin:15px 0; border-left:4px solid #E58BBE;">
-            <h4 style="margin:0 0 8px 0; color:#333;">Your Booking Details:</h4>
-            <p style="margin:5px 0; font-size:14px;"><strong>Booking #:</strong> ${bookingNumber}</p>
-            <p style="margin:5px 0; font-size:14px;"><strong>Date:</strong> ${formattedDate}</p>
-            <p style="margin:5px 0; font-size:14px;"><strong>Time:</strong> ${bookingTime}</p>
-            <p style="margin:5px 0; font-size:14px;"><strong>Services:</strong> ${services}</p>
-          </div>
-          <p style="font-size:16px; margin:15px 0; color:#333;">
-            We'd love to hear about your experience!
-          </p>
-          <p style="font-size:14px; color:#666;">
-            Your feedback helps us improve our service.
-          </p>
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: "Leave a Review",
-      cancelButtonText: "Maybe Later",
-      confirmButtonColor: "#E58BBE",
-      cancelButtonColor: "#ccc",
-      width: 500,
-      customClass: {
-        popup: "swal2-rounded"
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        closeMenu();
-        showSection('reviewsSection');
-        // Scroll to review form and pre-fill booking number in the name field if empty
-        setTimeout(() => {
-          const reviewForm = document.getElementById('reviewForm');
-          const nameField = document.getElementById('reviewName');
-          reviewForm.scrollIntoView({ behavior: 'smooth' });
-          
-          // If name field is empty, suggest using booking number format
-          if (!nameField.value.trim()) {
-            nameField.focus();
-            nameField.placeholder = `Customer from Booking #${bookingNumber}`;
-          }
-        }, 500);
-      }
-    });
-  }, 2000); // Show prompt 2 seconds after booking confirmation
-}
 
 // Function to display discount info in booking form
 function displayDiscountInfo(discountInfo) {
