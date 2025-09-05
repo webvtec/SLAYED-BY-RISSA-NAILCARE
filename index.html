@@ -1379,14 +1379,16 @@ function selectPeriod(period) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  const dateInput = document.getElementById("date");
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const today = new Date();
+  const todayString = today.toISOString().split('T')[0];
+  const dateInput = document.getElementById('date');
   if (dateInput) {
-    const today = new Date().toISOString().split("T")[0];
-    dateInput.setAttribute("min", today); // ✅ Prevents selecting past dates
+    dateInput.min = todayString;
   }
 });
-
+    
     function convertToMinutes(timeStr) {
   if (!timeStr || typeof timeStr !== 'string') return 0;
   
@@ -1723,9 +1725,7 @@ function closeBookingModal() {
 }
 
 
-    // UPDATE YOUR EXISTING showSection FUNCTION
-// Find your showSection function and replace it with this updated version:
-function showSection(sectionId) {
+    function showSection(sectionId) {
   document.querySelectorAll('.content-section').forEach(section =>
     section.classList.remove('active')
   );
@@ -1738,10 +1738,15 @@ function showSection(sectionId) {
   } else if (sectionId === 'productsSection') {
     loadProducts();
   } else if (sectionId === 'bookingSection') {
-    // Load discount info when booking section is opened
+    // Set minimum date and load discount info
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+      dateInput.min = today;
+    }
     loadDiscountInfo();
   }
-}
+    }
 
 // Assume firebase is initialized and 'db' and 'auth' are set up
 
@@ -3124,20 +3129,6 @@ async function loadDiscountInfo() {
   }
 }
 
-    
-    // Also set it whenever the booking section is shown
-    const originalShowSection = showSection;
-    showSection = function(sectionId) {
-      originalShowSection(sectionId);
-      if (sectionId === 'bookingSection') {
-        const today = new Date();
-        const todayString = today.toISOString().split('T')[0];
-        document.getElementById('date').min = todayString;
-        loadDiscountInfo();
-      }
-    };
-  }
-});
 
     
   </script>
