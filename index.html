@@ -1204,8 +1204,13 @@
     const db = firebase.firestore();
 
     firebase.auth().onAuthStateChanged(user => {
-  currentUser = user || null; // Store user if logged in, null if not
+  currentUser = user || null;
   loadReviews(currentUser);
+  
+  // Check for completed appointments when user logs in
+  if (user) {
+    checkForCompletedAppointments(user.uid);
+  }
 });
 
 
@@ -1703,8 +1708,6 @@ async function submitBooking(event) {
     
     document.getElementById('bookingModal').style.display = 'flex';
 
-    // Show review prompt after confirmation modal is closed
-showReviewPrompt(bookingNumber, date, time, service);
 
   } catch (error) {
     console.error("Booking error:", error);
@@ -1790,7 +1793,8 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
       comment,
       rating: selectedRating,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      uid: user.uid
+      uid: user.uid,
+      bookingNumber: document.getElementById('reviewForm').dataset.bookingNumber || null
     });
 
     msg.style.color = "green";
@@ -3129,7 +3133,133 @@ async function loadDiscountInfo() {
   }
 }
 
+async function checkForCompletedAppointments(userId) {
+  try {
+    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Check for appointments that ended in the last 7 days but user hasn't reviewed yet
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const bookingsSnapshot = await db.collection('bookings')
+      .where('uid', '==', userId)
+      .get();
+    
+    const completedBookings = [];
+    
+    for (let doc of bookingsSnapshot.docs) {
+      const booking = doc.data();
+      const bookingDate = new Date(booking.date + 'T00:00:00');
+      const bookingTime = convertToMinutes(booking.time);
+      const duration = booking.duration || 60;
+      
+      // Calculate appointment end time
+      const appointmentEnd = new Date(bookingDate);
+      appointmentEnd.setMinutes(bookingTime + duration);
+      
+      // Check if appointment ended, is within review window, and user hasn't dismissed prompt
+      if (appointmentEnd < now && appointmentEnd > sevenDaysAgo && !booking.reviewPromptDismissed) {
+        // Check if user already reviewed this booking
+        const existingReview = await db.collection('reviews')
+          .where('uid', '==', userId)
+          .where('bookingNumber', '==', booking.bookingNumber)
+          .get();
+        
+        if (existingReview.empty) {
+          completedBookings.push({
+            id: doc.id,
+            ...booking
+          });
+        }
+      }
+    }
+    
+    // Show review prompt for the most recent completed booking
+    if (completedBookings.length > 0) {
+      const mostRecent = completedBookings.sort((a, b) => 
+        new Date(b.date) - new Date(a.date)
+      )[0];
+      
+      // Show prompt after a short delay to let page load
+      setTimeout(() => {
+        showPostAppointmentReviewPrompt(mostRecent);
+      }, 3000);
+    }
+  } catch (error) {
+    console.error('Error checking completed appointments:', error);
+  }
+}
 
+
+    function showPostAppointmentReviewPrompt(booking) {
+  // Format the date nicely
+  const [year, month, day] = booking.date.split("-");
+  const formattedDate = new Date(year, month - 1, day).toLocaleDateString("en-US", {
+    weekday: 'long',
+    year: "numeric",
+    month: "long", 
+    day: "numeric",
+  });
+
+  Swal.fire({
+    title: "How was your recent appointment?",
+    html: `
+      <div style="text-align:center; padding:20px;">
+        <div style="background:#f8f9fa; border-radius:8px; padding:15px; margin:15px 0; border-left:4px solid #E58BBE;">
+          <h4 style="margin:0 0 8px 0; color:#333;">Your Recent Appointment:</h4>
+          <p style="margin:5px 0; font-size:14px;"><strong>Booking #:</strong> ${booking.bookingNumber}</p>
+          <p style="margin:5px 0; font-size:14px;"><strong>Date:</strong> ${formattedDate}</p>
+          <p style="margin:5px 0; font-size:14px;"><strong>Time:</strong> ${booking.time}</p>
+          <p style="margin:5px 0; font-size:14px;"><strong>Services:</strong> ${booking.service}</p>
+        </div>
+        <p style="font-size:16px; margin:15px 0; color:#333;">
+          We hope you loved your nails! Would you mind sharing your experience?
+        </p>
+        <p style="font-size:14px; color:#666;">
+          Your feedback helps us improve and helps other customers choose our services.
+        </p>
+      </div>
+    `,
+    showCancelButton: true,
+    showDenyButton: true,
+    confirmButtonText: "Leave a Review",
+    cancelButtonText: "Maybe Later",
+    denyButtonText: "Don't Ask Again",
+    confirmButtonColor: "#E58BBE",
+    cancelButtonColor: "#ccc",
+    denyButtonColor: "#999",
+    width: 500,
+    customClass: {
+      popup: "swal2-rounded"
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      closeMenu();
+      showSection('reviewsSection');
+      
+      // Pre-fill the booking number in the form
+      setTimeout(() => {
+        const reviewForm = document.getElementById('reviewForm');
+        const nameField = document.getElementById('reviewName');
+        
+        reviewForm.dataset.bookingNumber = booking.bookingNumber;
+        reviewForm.scrollIntoView({ behavior: 'smooth' });
+        
+        if (!nameField.value.trim()) {
+          nameField.value = booking.name || '';
+          nameField.focus();
+        }
+      }, 500);
+    } else if (result.isDenied) {
+      // Mark this booking as "don't ask again"
+      db.collection('bookings').doc(booking.id).update({
+        reviewPromptDismissed: true
+      });
+    }
+  });
+    }
     
   </script>
 </body>
