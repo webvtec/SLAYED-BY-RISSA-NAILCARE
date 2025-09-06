@@ -673,6 +673,7 @@
   inputmode="numeric" 
   maxlength="14" 
   placeholder="eg... (876) 123-4567" 
+  oninput="formatPhoneNumber(this)"
   required 
 />
 
@@ -961,13 +962,13 @@
 
       <div style="margin-bottom: 20px;">
         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number:</label>
-        <input id="checkoutPhone" required type="tel" style="
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          font-size: 16px;
-        ">
+        <input id="checkoutPhone" required type="tel" maxlength="14" oninput="formatPhoneNumber(this)" placeholder="(876) 123-4567" style="
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+">
       </div>
 
 <!-- Knutsford Locations Dropdown (hidden by default) -->
@@ -1639,12 +1640,7 @@ function submitBooking(event) {
     });
 }
 
-    
-// The closeBookingModal() function should already exist in your HTML/existing JavaScript
-// Add this function to close the modal
-function closeBookingModal() {
-  document.getElementById('bookingModal').style.display = 'none';
-            }
+
 
 // Add this function to close the modal
 function closeBookingModal() {
@@ -2125,12 +2121,15 @@ function getSelectedServiceDuration() {
 }
 
 
-    
-
 // Helper function to check if a time slot is in the past
 function isTimeSlotInPast(selectedDate, timeString) {
   const now = new Date();
   const selectedDateTime = new Date(selectedDate + 'T00:00:00');
+  
+  // If the selected date is before today, it's in the past
+  if (selectedDateTime < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+    return true;
+  }
   
   // If it's not today, it's not in the past
   if (selectedDateTime.toDateString() !== now.toDateString()) {
@@ -2141,8 +2140,8 @@ function isTimeSlotInPast(selectedDate, timeString) {
   const timeMinutes = convertToMinutes(timeString);
   const currentMinutes = (now.getHours() * 60) + now.getMinutes();
   
-  // Add 30-minute buffer - can't book slots that start within 30 minutes
-  return timeMinutes <= (currentMinutes + 30);
+  // Add 60-minute buffer - can't book slots that start within 60 minutes
+  return timeMinutes <= (currentMinutes + 60);
 }
 
 // Updated getSelectedServiceDuration to properly sum multiple services
@@ -2236,7 +2235,7 @@ function getSelectedServiceDuration() {
       }
     });
 
-    // Generate slots every 15 minutes
+    // Generate slots every 5 minutes
     for (let t = openMinutes; t <= closeMinutes - duration; t += 5) {
       const end = t + duration;
       let conflict = bookings.some(b => !(end <= b.start || t >= b.end)) ||
@@ -2298,7 +2297,35 @@ window.onpopstate = function(event) {
 // Shopping cart functionality
 let cart = [];
 
-// Updated loadProducts function with better error handling
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').min = today;
+});
+
+
+
+function formatPhoneNumber(input) {
+    // Remove all non-digits
+    let value = input.value.replace(/\D/g, '');
+    
+    // Limit to 10 digits
+    if (value.length > 10) {
+        value = value.substring(0, 10);
+    }
+    
+    // Format as (876) 123-4567
+    if (value.length >= 6) {
+        value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`;
+    } else if (value.length >= 3) {
+        value = `(${value.substring(0, 3)}) ${value.substring(3)}`;
+    } else if (value.length > 0) {
+        value = `(${value}`;
+    }
+    
+    input.value = value;
+}
+
 
 
 
