@@ -2140,8 +2140,8 @@ function isTimeSlotInPast(selectedDate, timeString) {
   const timeMinutes = convertToMinutes(timeString);
   const currentMinutes = (now.getHours() * 60) + now.getMinutes();
   
-  // Add 60-minute buffer - can't book slots that start within 60 minutes
-  return timeMinutes <= (currentMinutes + 60);
+  // Add 0-minute buffer - can't book slots that start within 60 minutes
+  return timeMinutes <= (currentMinutes + 0);
 }
 
 // Updated getSelectedServiceDuration to properly sum multiple services
