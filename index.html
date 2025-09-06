@@ -2136,12 +2136,12 @@ function isTimeSlotInPast(selectedDate, timeString) {
     return false;
   }
   
-  // If it's today, check if the time has passed
+  // If it's today, check if the time has passed (no buffer - allow last minute bookings)
   const timeMinutes = convertToMinutes(timeString);
   const currentMinutes = (now.getHours() * 60) + now.getMinutes();
   
-  // Add 0-minute buffer - can't book slots that start within 60 minutes
-  return timeMinutes <= (currentMinutes + 0);
+  // Only block slots that have already started
+  return timeMinutes <= currentMinutes;
 }
 
 // Updated getSelectedServiceDuration to properly sum multiple services
